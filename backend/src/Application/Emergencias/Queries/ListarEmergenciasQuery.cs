@@ -1,9 +1,13 @@
 using Sige.Application.Common.Interfaces;
+using Sige.Application.Common.Security;
 using Microsoft.EntityFrameworkCore;
 
 namespace Sige.Application.Emergencias.Queries;
 
 // FR-003, FR-011: emergencias para el mapa operativo y el dashboard.
+// Constitution Principio V: todo acceso MUST requerir autenticacion. Hallazgo de
+// Converge: esta query no tenia [Authorize] y respondia sin token.
+[Authorize]
 public record ListarEmergenciasQuery : IRequest<List<EmergenciaDto>>;
 
 public class ListarEmergenciasQueryHandler : IRequestHandler<ListarEmergenciasQuery, List<EmergenciaDto>>

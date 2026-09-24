@@ -1,9 +1,13 @@
 using Sige.Application.Common.Interfaces;
+using Sige.Application.Common.Security;
 using Sige.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Sige.Application.Dashboard.Queries;
 
+// Constitution Principio V: todo acceso MUST requerir autenticacion. Hallazgo de
+// Converge: esta query no tenia [Authorize] y respondia sin token.
+[Authorize]
 public record ObtenerIndicadoresDashboardQuery : IRequest<DashboardIndicadoresDto>;
 
 public class ObtenerIndicadoresDashboardQueryHandler

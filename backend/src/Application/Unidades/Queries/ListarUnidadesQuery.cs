@@ -1,8 +1,12 @@
 using Sige.Application.Common.Interfaces;
+using Sige.Application.Common.Security;
 using Microsoft.EntityFrameworkCore;
 
 namespace Sige.Application.Unidades.Queries;
 
+// Constitution Principio V: todo acceso MUST requerir autenticacion. Hallazgo de
+// Converge: esta query no tenia [Authorize] y respondia sin token.
+[Authorize]
 public record ListarUnidadesQuery : IRequest<List<UnidadDto>>;
 
 public class ListarUnidadesQueryHandler : IRequestHandler<ListarUnidadesQuery, List<UnidadDto>>

@@ -270,6 +270,29 @@ en tiempo de ejecución. Verificado con `curl`: `POST /api/Emergencias` con
 
 ---
 
+## Phase 10: Convergence (`/speckit-converge`, 2026-09-26)
+
+Generado por `/speckit-converge` comparando la implementación real contra `spec.md`,
+`plan.md`, `tasks.md` y `constitution.md`. Un hallazgo CRITICAL (F1) se corrigió en el
+momento mismo de la revisión, antes de escribir esta fase; queda documentado aquí por
+trazabilidad y no aparece como tarea pendiente.
+
+**F1 (CRITICAL, ya corregido — no requiere tarea)**: `ListarEmergenciasQuery`,
+`ObtenerEmergenciaPorIdQuery`, `ListarUnidadesQuery` y `ObtenerIndicadoresDashboardQuery`
+no tenían `[Authorize]` — cualquier petición sin token recibía `200 OK` con datos reales,
+violando Constitution Principio V y FR-012. Confirmado con `curl` (200 sin
+`Authorization`), corregido agregando `[Authorize]` a las 4 queries, cubierto con
+`AutorizacionQueriesTests.cs` (4 casos nuevos), y reverificado con `curl` (401 sin
+token, 200 con token).
+
+- [ ] T067 [P] Implementar el cliente SignalR en el frontend (`OperacionesHubService`, suscripción a `EmergenciaActualizada`/`UnidadActualizada`) y conectarlo a `MapaComponent` y `DashboardComponent` para que se actualicen sin recarga manual, per FR-014/SC-006 (partial — T017 nunca se completó)
+- [ ] T068 [P] Automatizar al menos las pruebas de integración críticas de `tasks.md` (creación de emergencia, asignación con conflicto de concurrencia, cierre/liberación de unidad) en `Application.FunctionalTests`, usando `SigeDb_Test` y `ConnectionStrings__SigeDbTest` per tasks.md T020/T037/T043 (missing — verificación fue solo manual con `curl`)
+- [ ] T069 [P] Crear el Dockerfile del frontend y descomentar/completar el servicio `frontend` en `docker-compose.yml`; verificar `docker compose up --build` de punta a punta contra el MySQL existente per plan.md Project Structure (partial — nunca se probó, todo Implement usó `dotnet run`/`ng serve` directos)
+- [ ] T070 [P] Configurar linting básico (`dotnet format` para el backend, ESLint + Prettier para el frontend) per tasks.md T005 (missing)
+- [ ] T071 Verificación manual del recorrido a 1024px en un navegador real (las 6 pantallas + un error forzado por formulario) per tasks.md T066, SC-007 (missing — sin herramienta de captura en ninguna sesión de Implement)
+
+---
+
 ## Dependencies & Execution Order
 
 ### Dependencias entre fases
