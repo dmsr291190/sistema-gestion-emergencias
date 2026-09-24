@@ -72,17 +72,21 @@ del recorrido vertical). Bloquea todas las historias de usuario.
 
 - [ ] T019 [P] [US1] Prueba unitaria de validación de `CrearEmergenciaCommand` (campos obligatorios de FR-001/FR-015/FR-019) en `backend/tests/Application.UnitTests/Emergencias/CrearEmergenciaValidatorTests.cs`
 - [ ] T020 [P] [US1] Prueba de integración de `POST /emergencias` y `GET /emergencias/{id}` en `backend/tests/Application.FunctionalTests/Emergencias/CrearEmergenciaTests.cs`
+- [ ] T020b [P] [US1] Prueba de integración: `POST /emergencias/{id}/asignaciones` rechaza si la emergencia no está "validada" (FR-009) en `backend/tests/Application.FunctionalTests/Emergencias/ValidarEmergenciaTests.cs` — agregada tras `/speckit-analyze` (hallazgo C1)
 
 ### Implementación de User Story 1
 
 - [ ] T021 [P] [US1] Command `CrearEmergencia` + `CrearEmergenciaValidator` (FluentValidation) en `backend/src/Application/Emergencias/Commands/CrearEmergencia/`
-- [ ] T022 [US1] Endpoint `POST /emergencias` en `backend/src/Web/Controllers/EmergenciasController.cs` (depende de T021); asigna estado inicial "reportada" (FR-002) y emite `EmergenciaActualizada` por SignalR (depende de T013)
+- [ ] T022 [US1] Endpoint `POST /emergencias` en `backend/src/Web/Controllers/EmergenciasController.cs` (depende de T021); asigna estado inicial "reportada" (FR-002), genera `EventoAuditoria` "EmergenciaCreada" (FR-010) y emite `EmergenciaActualizada` por SignalR (depende de T013)
 - [ ] T023 [P] [US1] Queries `ListarEmergencias` y `ObtenerEmergenciaPorId` en `backend/src/Application/Emergencias/Queries/`
 - [ ] T024 [US1] Endpoints `GET /emergencias` y `GET /emergencias/{id}` en `EmergenciasController.cs` (depende de T023)
 - [ ] T025 [P] [US1] Componente Angular "Nueva emergencia" (formulario + selector de ubicación en mapa) en `frontend/src/app/views/emergencias/nueva-emergencia`
 - [ ] T026 [P] [US1] Componente Angular "Mapa operativo" (Leaflet + OpenStreetMap dentro del layout CoreUI) en `frontend/src/app/views/mapa`, suscrito a `EmergenciaActualizada`
 - [ ] T027 [US1] Componente Angular "Detalle de emergencia" en `frontend/src/app/views/emergencias/detalle-emergencia` (depende de T024)
 - [ ] T028 [US1] Servicio Angular `EmergenciasService` (consumo de API + integración SignalR) en `frontend/src/app/core/services/emergencias.service.ts` (depende de T022, T024, T017)
+- [ ] T028b [US1] Command `ValidarEmergencia` (transición "reportada" → "validada", FR-009; requisito previo a la asignación de unidades) en `backend/src/Application/Emergencias/Commands/ValidarEmergencia/` — agregado tras `/speckit-analyze` (hallazgo C1: la transición no tenía ninguna tarea asociada)
+- [ ] T028c [US1] Endpoint `POST /emergencias/{id}/validar` en `EmergenciasController.cs` (depende de T028b); genera `EventoAuditoria` "EmergenciaValidada" (FR-010) y emite `EmergenciaActualizada` — agregado tras `/speckit-analyze` (hallazgo C1)
+- [ ] T028d [US1] Botón/acción "Validar" en el detalle de emergencia, visible mientras el estado sea "reportada" (depende de T027, T028c) — agregado tras `/speckit-analyze` (hallazgo C1)
 
 **Checkpoint**: User Story 1 funcional y demostrable de forma independiente (SC-001, SC-002).
 
@@ -124,8 +128,8 @@ del recorrido vertical). Bloquea todas las historias de usuario.
 
 ### Implementación de User Story 3
 
-- [ ] T038 [US3] Command `AsignarUnidad` con revalidación optimista dentro de la transacción (FR-007) en `backend/src/Application/Asignaciones/Commands/AsignarUnidad/` (depende de T006–T008)
-- [ ] T039 [US3] Endpoint `POST /emergencias/{id}/asignaciones` en `backend/src/Web/Controllers/AsignacionesController.cs` (depende de T038); marca la unidad como "ocupada" y emite `EmergenciaActualizada` + `UnidadActualizada`
+- [ ] T038 [US3] Command `AsignarUnidad` con revalidación optimista dentro de la transacción (FR-007) en `backend/src/Application/Asignaciones/Commands/AsignarUnidad/` (depende de T006–T008, T028b — la emergencia debe estar "validada", FR-009)
+- [ ] T039 [US3] Endpoint `POST /emergencias/{id}/asignaciones` en `backend/src/Web/Controllers/AsignacionesController.cs` (depende de T038); marca la unidad como "ocupada", genera `EventoAuditoria` "UnidadAsignada" (FR-010) y emite `EmergenciaActualizada` + `UnidadActualizada`
 - [ ] T040 [P] [US3] Componente Angular "Centro de despacho" (selección de unidades disponibles + confirmación de asignación) en `frontend/src/app/views/despacho`
 - [ ] T041 [US3] Manejo en frontend del error `409 UNIDAD_NO_DISPONIBLE` con mensaje claro al Operador (depende de T040)
 
@@ -150,7 +154,7 @@ del recorrido vertical). Bloquea todas las historias de usuario.
 - [ ] T045 [US4] Command `CambiarEstadoAsignacion` (avanza despachada→en ruta→en el lugar→atendida y recalcula el estado de la Emergencia) en `backend/src/Application/Asignaciones/Commands/CambiarEstadoAsignacion/`
 - [ ] T046 [US4] Endpoint `PATCH /asignaciones/{id}/estado` en `AsignacionesController.cs` (depende de T045); genera `EventoAuditoria` (FR-010)
 - [ ] T047 [US4] Commands `CerrarEmergencia` y `ReabrirEmergencia` (`[Authorize(Roles = "Supervisor")]`, libera unidades en cierre — FR-018) en `backend/src/Application/Emergencias/Commands/`
-- [ ] T048 [US4] Endpoints `POST /emergencias/{id}/cerrar` y `POST /emergencias/{id}/reabrir` en `EmergenciasController.cs` (depende de T047)
+- [ ] T048 [US4] Endpoints `POST /emergencias/{id}/cerrar` y `POST /emergencias/{id}/reabrir` en `EmergenciasController.cs` (depende de T047); generan `EventoAuditoria` "EmergenciaCerrada"/"EmergenciaReabierta" respectivamente (FR-010)
 - [ ] T049 [US4] Endpoint `GET /emergencias/{id}/timeline` (lee `EventoAuditoria` ordenado por fecha) en `EmergenciasController.cs`
 - [ ] T050 [US4] Componente Angular "Línea de tiempo" dentro del detalle de emergencia, mostrando cada evento con usuario y fecha/hora (depende de T027, T049)
 - [ ] T051 [US4] Botones de avance de estado, cierre y reapertura en el detalle de emergencia, visibles/habilitados según rol (depende de T050)

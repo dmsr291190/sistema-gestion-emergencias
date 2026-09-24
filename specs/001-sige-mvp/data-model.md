@@ -75,7 +75,7 @@ si no, rechaza con error de negocio (FR-007) — ver `research.md` §4.
 | Id | Guid | PK |
 | EmergenciaId | FK Emergencia | Nullable si el evento es sobre una Unidad sin emergencia asociada |
 | UnidadId | FK UnidadRespuesta (nullable) | |
-| TipoEvento | string | Ej. "EmergenciaCreada", "UnidadAsignada", "CambioEstado", "EmergenciaCerrada", "EmergenciaReabierta" |
+| TipoEvento | string | Ej. "EmergenciaCreada", "EmergenciaValidada", "UnidadAsignada", "CambioEstado", "EmergenciaCerrada", "EmergenciaReabierta" |
 | EstadoAnterior / EstadoNuevo | string (nullable) | Para eventos de cambio de estado |
 | UsuarioId | FK Usuario | Quién ejecutó el cambio (FR-010) |
 | FechaHora | datetime (UTC) | |

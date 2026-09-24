@@ -205,9 +205,13 @@ de esos datos.
 - **FR-008**: El sistema MUST mantener una línea de tiempo completa de cada
   emergencia, desde su registro hasta su cierre, incluyendo cada cambio de estado.
 - **FR-009**: El sistema MUST soportar las transiciones de estado: reportada →
-  validada → despachada → en ruta → en el lugar → atendida → cerrada.
-- **FR-010**: El sistema MUST registrar qué usuario realizó cada cambio crítico
-  (asignación, cambio de estado, cierre) y en qué momento.
+  validada → despachada → en ruta → en el lugar → atendida → cerrada. La transición
+  "reportada" → "validada" es una acción explícita de cualquier Operador o Supervisor
+  (a diferencia del cierre/reapertura, restringido a Supervisor por FR-017), y MUST
+  ejecutarse antes de poder asignar unidades (FR-006).
+- **FR-010**: El sistema MUST registrar qué usuario realizó cada cambio crítico —
+  incluyendo la creación de la emergencia, su validación, cada asignación, cada
+  cambio de estado, y su cierre o reapertura — y en qué momento.
 - **FR-011**: El sistema MUST mostrar un dashboard con indicadores operativos
   básicos: emergencias activas por estado, por prioridad, y unidades disponibles
   vs. ocupadas.

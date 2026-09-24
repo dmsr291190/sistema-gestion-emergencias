@@ -13,12 +13,13 @@ Base path sugerido: `/api/v1`. Todos los endpoints (salvo login) requieren JWT e
 
 | Método | Ruta | Descripción | Requisitos |
 |---|---|---|---|
-| POST | `/emergencias` | Crea una emergencia (estado inicial `reportada`). | FR-001, FR-002, FR-015 |
+| POST | `/emergencias` | Crea una emergencia (estado inicial `reportada`); genera `EventoAuditoria` "EmergenciaCreada". | FR-001, FR-002, FR-010, FR-015 |
+| POST | `/emergencias/{id}/validar` | Transición `reportada` → `validada`; requisito previo para poder asignar unidades. Genera `EventoAuditoria` "EmergenciaValidada". | FR-009, FR-010 |
 | GET | `/emergencias` | Lista emergencias, filtrable por estado/prioridad (para mapa y dashboard). | FR-003, FR-011 |
 | GET | `/emergencias/{id}` | Detalle: datos, unidades asignadas, timeline. | US1, US4 |
 | PATCH | `/emergencias/{id}/estado` | Cambia el estado (validada, despachada, etc.) de la emergencia o de una asignación específica. | FR-009, FR-016 |
-| POST | `/emergencias/{id}/cerrar` | **[Supervisor]** Cierra la emergencia y libera automáticamente sus unidades asignadas (pasan a Disponible, salvo Fuera de Servicio). | FR-017, FR-018 |
-| POST | `/emergencias/{id}/reabrir` | **[Supervisor]** Reabre una emergencia cerrada. | FR-017 |
+| POST | `/emergencias/{id}/cerrar` | **[Supervisor]** Cierra la emergencia y libera automáticamente sus unidades asignadas (pasan a Disponible, salvo Fuera de Servicio). Genera `EventoAuditoria` "EmergenciaCerrada". | FR-017, FR-018, FR-010 |
+| POST | `/emergencias/{id}/reabrir` | **[Supervisor]** Reabre una emergencia cerrada. Genera `EventoAuditoria` "EmergenciaReabierta". | FR-017, FR-010 |
 | GET | `/emergencias/{id}/timeline` | Devuelve los `EventoAuditoria` asociados, ordenados por fecha. | FR-008, FR-010 |
 
 ## Unidades
@@ -33,7 +34,7 @@ Base path sugerido: `/api/v1`. Todos los endpoints (salvo login) requieren JWT e
 
 | Método | Ruta | Descripción | Requisitos |
 |---|---|---|---|
-| POST | `/emergencias/{id}/asignaciones` | Asigna una unidad disponible a la emergencia; revalida disponibilidad en la misma transacción. | FR-006, FR-007 |
+| POST | `/emergencias/{id}/asignaciones` | Asigna una unidad disponible a la emergencia (requiere que ya esté `validada`); revalida disponibilidad en la misma transacción. Genera `EventoAuditoria` "UnidadAsignada". | FR-006, FR-007, FR-009, FR-010 |
 | PATCH | `/asignaciones/{id}/estado` | Avanza el estado de esa asignación específica (despachada → en ruta → en el lugar → atendida). | FR-016 |
 
 **Error de negocio esperado** en `POST /emergencias/{id}/asignaciones` cuando la unidad
