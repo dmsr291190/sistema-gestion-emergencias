@@ -32,6 +32,8 @@
     "@coreui/coreui": "^5.4.3",
     "@coreui/icons-angular": "~5.5.26",
     "@popperjs/core": "~2.11.8",
+    "@types/leaflet": "^1.9.22",
+    "leaflet": "^1.9.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

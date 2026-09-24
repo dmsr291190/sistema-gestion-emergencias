@@ -70,25 +70,25 @@ del recorrido vertical). Bloquea todas las historias de usuario.
 
 ### Tests para User Story 1
 
-- [ ] T019 [P] [US1] Prueba unitaria de validación de `CrearEmergenciaCommand` (campos obligatorios de FR-001/FR-015/FR-019) en `backend/tests/Application.UnitTests/Emergencias/CrearEmergenciaValidatorTests.cs`
-- [ ] T020 [P] [US1] Prueba de integración de `POST /emergencias` y `GET /emergencias/{id}` en `backend/tests/Application.FunctionalTests/Emergencias/CrearEmergenciaTests.cs`
-- [ ] T020b [P] [US1] Prueba de integración: `POST /emergencias/{id}/asignaciones` rechaza si la emergencia no está "validada" (FR-009) en `backend/tests/Application.FunctionalTests/Emergencias/ValidarEmergenciaTests.cs` — agregada tras `/speckit-analyze` (hallazgo C1)
+- [x] T019 [P] [US1] Prueba unitaria de validación de `CrearEmergenciaCommand` (campos obligatorios de FR-001/FR-015/FR-019) en `backend/tests/Application.UnitTests/Emergencias/CrearEmergenciaValidatorTests.cs` — 5 casos, 9/9 pruebas del proyecto en verde
+- [ ] T020 [P] [US1] Prueba de integración de `POST /emergencias` y `GET /emergencias/{id}` — **no automatizada**; se verificó manualmente end-to-end con `curl` (login → crear → listar → detalle), ver bitácora. Falta escribirla como prueba real en `Application.FunctionalTests`
+- [ ] T020b [P] [US1] Prueba de integración de la revalidación de "validada" antes de asignar — **no automatizada** (depende de US3/T038, que todavía no existe); verificado manualmente que `/validar` exige estado "Reportada"
 
 ### Implementación de User Story 1
 
-- [ ] T021 [P] [US1] Command `CrearEmergencia` + `CrearEmergenciaValidator` (FluentValidation) en `backend/src/Application/Emergencias/Commands/CrearEmergencia/`
-- [ ] T022 [US1] Endpoint `POST /emergencias` en `backend/src/Web/Controllers/EmergenciasController.cs` (depende de T021); asigna estado inicial "reportada" (FR-002), genera `EventoAuditoria` "EmergenciaCreada" (FR-010) y emite `EmergenciaActualizada` por SignalR (depende de T013)
-- [ ] T023 [P] [US1] Queries `ListarEmergencias` y `ObtenerEmergenciaPorId` en `backend/src/Application/Emergencias/Queries/`
-- [ ] T024 [US1] Endpoints `GET /emergencias` y `GET /emergencias/{id}` en `EmergenciasController.cs` (depende de T023)
-- [ ] T025 [P] [US1] Componente Angular "Nueva emergencia" (formulario + selector de ubicación en mapa) en `frontend/src/app/views/emergencias/nueva-emergencia`
-- [ ] T026 [P] [US1] Componente Angular "Mapa operativo" (Leaflet + OpenStreetMap dentro del layout CoreUI) en `frontend/src/app/views/mapa`, suscrito a `EmergenciaActualizada`
-- [ ] T027 [US1] Componente Angular "Detalle de emergencia" en `frontend/src/app/views/emergencias/detalle-emergencia` (depende de T024)
-- [ ] T028 [US1] Servicio Angular `EmergenciasService` (consumo de API + integración SignalR) en `frontend/src/app/core/services/emergencias.service.ts` (depende de T022, T024, T017)
-- [ ] T028b [US1] Command `ValidarEmergencia` (transición "reportada" → "validada", FR-009; requisito previo a la asignación de unidades) en `backend/src/Application/Emergencias/Commands/ValidarEmergencia/` — agregado tras `/speckit-analyze` (hallazgo C1: la transición no tenía ninguna tarea asociada)
-- [ ] T028c [US1] Endpoint `POST /emergencias/{id}/validar` en `EmergenciasController.cs` (depende de T028b); genera `EventoAuditoria` "EmergenciaValidada" (FR-010) y emite `EmergenciaActualizada` — agregado tras `/speckit-analyze` (hallazgo C1)
-- [ ] T028d [US1] Botón/acción "Validar" en el detalle de emergencia, visible mientras el estado sea "reportada" (depende de T027, T028c) — agregado tras `/speckit-analyze` (hallazgo C1)
+- [x] T021 [P] [US1] Command `CrearEmergencia` + `CrearEmergenciaCommandValidator` (FluentValidation) en `backend/src/Application/Emergencias/Commands/CrearEmergencia/`
+- [x] T022 [US1] Endpoint `POST /api/Emergencias` en `backend/src/Web/Endpoints/Emergencias.cs` — **Minimal API (`IEndpointGroup`), no un `Controller` MVC**: la plantilla Jason Taylor no usa controladores; prefijo real `/api/Emergencias`, no `/emergencias` (contrato actualizado). Asigna "Reportada", genera `EventoAuditoria` "EmergenciaCreada" y emite `EmergenciaActualizada` por SignalR. **Verificado con `curl`**: 401 sin token, 201 con token, 400 si falta un campo obligatorio
+- [x] T023 [P] [US1] Queries `ListarEmergenciasQuery` y `ObtenerEmergenciaPorIdQuery` en `backend/src/Application/Emergencias/Queries/`
+- [x] T024 [US1] Endpoints `GET /api/Emergencias` y `GET /api/Emergencias/{id}` en `Emergencias.cs` — verificados con `curl`, el detalle incluye `timeline` y `asignaciones`
+- [x] T025 [P] [US1] Componente Angular "Nueva emergencia" — **incluido dentro de `emergencias.component.ts`** (formulario + listado en la misma vista) en lugar de un componente separado `nueva-emergencia/`, por simplicidad en esta iteración. **Sin selector de ubicación en el mapa**: los campos lat/lng son inputs numéricos manuales, no un picker interactivo
+- [x] T026 [P] [US1] Componente Angular "Mapa operativo" (Leaflet + OSM) en `frontend/src/app/views/mapa/mapa.component.ts`, carga las emergencias reales vía `GET /api/Emergencias` — **sin suscripción a SignalR todavía** (T017 sigue pendiente); por ahora se recarga al entrar a la vista, no en vivo
+- [x] T027 [US1] Componente Angular "Detalle de emergencia" en `frontend/src/app/views/emergencias/detalle/emergencia-detalle.component.ts`, muestra la línea de tiempo completa
+- [x] T028 [US1] Servicio Angular `EmergenciasService` en `frontend/src/app/core/services/emergencias.service.ts` — **sin integración SignalR** (T017 pendiente); además se creó `AuthService` + `authInterceptor` + `authGuard` (parte de T016, no completo: falta guard específico por rol, solo hay guard de autenticación)
+- [x] T028b [US1] Command `ValidarEmergencia` en `backend/src/Application/Emergencias/Commands/ValidarEmergencia/` — agregado tras `/speckit-analyze` (hallazgo C1)
+- [x] T028c [US1] Endpoint `POST /api/Emergencias/{id}/validar` en `Emergencias.cs` (depende de T028b); genera `EventoAuditoria` "EmergenciaValidada" y emite `EmergenciaActualizada` — verificado con `curl` (204, timeline con 2 eventos)
+- [x] T028d [US1] Botón "Validar" en el detalle de emergencia, visible solo si `estado === Reportada`
 
-**Checkpoint**: User Story 1 funcional y demostrable de forma independiente (SC-001, SC-002).
+**Checkpoint**: User Story 1 funcional y **verificada end-to-end contra MySQL real** (backend con `curl`; frontend compila y sirve, sin verificación visual en navegador — no hay herramienta de captura de pantalla disponible en esta sesión). SC-001/SC-002 pendientes de medir con un cronómetro real en una demo.
 
 ---
 

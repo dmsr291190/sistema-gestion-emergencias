@@ -32,6 +32,8 @@ public static class DependencyInjection
         });
 
         builder.Services.AddCors();
+
+        builder.Services.AddSignalR();
     }
 
     public static void AddKeyVaultIfConfigured(this IHostApplicationBuilder builder)

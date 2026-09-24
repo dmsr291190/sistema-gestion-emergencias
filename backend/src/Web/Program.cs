@@ -1,4 +1,5 @@
 using Sige.Infrastructure.Data;
+using Sige.Web.Hubs;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,9 @@ app.UseCors(static builder =>
 
 app.UseFileServer();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapOpenApi();
 app.MapScalarApiReference();
 
@@ -41,6 +45,7 @@ app.Map("/", () => Results.Redirect("/scalar"));
 
 app.MapDefaultEndpoints();
 app.MapEndpoints(typeof(Program).Assembly);
+app.MapHub<OperacionesHub>("/hubs/operaciones");
 
 
 app.Run();

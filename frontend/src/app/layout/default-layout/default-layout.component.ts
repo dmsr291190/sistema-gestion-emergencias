@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import {
   ContainerComponent,
   HeaderBrandComponent,
@@ -9,6 +9,7 @@ import {
   NavItemComponent,
   NavLinkDirective
 } from '@coreui/angular';
+import { AuthService } from '../../core/services/auth.service';
 
 // Layout base del MVP (guia SDD, seccion 17: pantallas objetivo).
 // Se usa una barra de navegacion superior (c-header) en lugar de un c-sidebar
@@ -41,6 +42,7 @@ import {
             <c-nav-item><a cNavLink routerLink="/despacho" routerLinkActive="active">Despacho</a></c-nav-item>
           </c-nav>
         </c-header-nav>
+        <button class="btn btn-sm btn-outline-secondary" (click)="logout()">Salir</button>
       </c-container>
     </c-header>
     <c-container fluid class="py-4">
@@ -48,4 +50,14 @@ import {
     </c-container>
   `
 })
-export class DefaultLayoutComponent {}
+export class DefaultLayoutComponent {
+  constructor(
+    private readonly auth: AuthService,
+    private readonly router: Router
+  ) {}
+
+  logout(): void {
+    this.auth.logout();
+    this.router.navigateByUrl('/login');
+  }
+}
