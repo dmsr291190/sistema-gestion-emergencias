@@ -490,3 +490,9 @@ $RECYCLE.BIN/
 *.db
 *.db-shm
 *.db-wal
+
+# Configuracion local con secretos reales (cadenas de conexion, etc.). Nunca
+# versionar; appsettings.json solo debe traer placeholders. Ver constitution.md
+# ("Restricciones Tecnicas y de Calidad": ningun secreto debe versionarse).
+appsettings.Development.json
+appsettings.*.local.json

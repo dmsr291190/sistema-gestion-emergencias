@@ -273,7 +273,9 @@ en cada formulario, sin necesidad de un flujo de negocio completo.
 - **FR-016**: Cuando una emergencia tiene varias unidades asignadas, cada unidad
   MUST progresar su propio estado (despachada, en ruta, en el lugar, atendida) de
   forma independiente; el estado general de la emergencia MUST pasar a "atendida"
-  únicamente cuando todas sus unidades asignadas alcanzan "atendida".
+  únicamente cuando todas sus unidades asignadas alcanzan "atendida". Una asignación
+  MUST solo poder avanzar hacia adelante en esa secuencia: el sistema MUST rechazar
+  cualquier intento de retroceder a un estado anterior o de repetir el estado actual.
 - **FR-017**: El sistema MUST restringir el cierre y la reapertura de una emergencia
   exclusivamente al rol Supervisor. No hay límite de veces que una emergencia puede
   reabrirse; cada cierre y cada reapertura MUST generar su propio evento de auditoría

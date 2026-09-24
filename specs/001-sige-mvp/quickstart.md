@@ -47,9 +47,19 @@ ya existente en Docker, según la estructura definida en `plan.md`.
 
 1. Con una única unidad `Disponible`, abrir dos solicitudes de asignación casi
    simultáneas hacia dos emergencias distintas (puede simularse con dos pestañas o
-   dos llamadas a `POST /emergencias/{id}/asignaciones`).
+   dos llamadas a `POST /api/Emergencias/{id}/asignaciones`).
 2. Verificar que solo una tiene éxito y la otra recibe `409 Conflict` con código
    `UNIDAD_NO_DISPONIBLE`.
 
 Este documento se referencia desde `tasks.md` (etapa `/speckit-tasks`) como la prueba
 de aceptación de extremo a extremo del MVP.
+
+## Resultado de la ejecución (Polish, 2026-09-26)
+
+Ejecutado con `curl` contra el backend real (`http://localhost:4401`, MySQL en
+Docker) usando datos nuevos, sin reutilizar los de las pruebas de US1–US5. Los 10
+pasos del escenario principal y los 2 de la prueba de concurrencia se verificaron
+exitosamente — ver el detalle completo en la Bitácora de Ejecución, sección Polish.
+No se ejecutó vía `docker compose up --build` (el `Dockerfile`/`docker-compose.yml`
+del backend no se probó en esta sesión; se usó `dotnet run` directo, ya usado durante
+todo Implement) — queda como pendiente explícito antes de la demo real en aula.

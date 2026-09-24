@@ -16,10 +16,11 @@ que el requisito, tal como está escrito, es claro/completo/consistente.
 
 ## Claridad de Estados y Transiciones
 
-- [ ] CHK001 - ¿Están definidas explícitamente todas las transiciones permitidas entre
+- [x] CHK001 - ¿Están definidas explícitamente todas las transiciones permitidas entre
   los 7 estados de una emergencia, incluyendo cuáles están prohibidas? [Clarity, Spec §FR-009] →
-  Diferido: el orden secuencial está definido (FR-009); prohibir saltos/retrocesos
-  explícitos se deja como regla de implementación a validar en `/speckit-analyze`.
+  Resuelto en Polish: FR-016 ahora prohíbe explícitamente retroceder o repetir el
+  estado de una asignación; implementado y probado (`CambiarEstadoAsignacionTests
+  .NoPermiteRetrocederOMantenerElMismoEstado`, `ConflictException TRANSICION_INVALIDA`).
 - [x] CHK002 - ¿Se especifica cómo se deriva el estado general de la emergencia cuando
   cada unidad asignada progresa de forma independiente? [Completeness, Spec §FR-016]
 - [x] CHK003 - ¿Es medible/verificable el momento exacto en que una emergencia pasa a
@@ -52,10 +53,13 @@ que el requisito, tal como está escrito, es claro/completo/consistente.
   revalidación optimista de disponibilidad falla al confirmar una asignación? [Completeness, Spec §FR-007, Clarifications]
 - [x] CHK011 - ¿Es verificable/objetivo el mensaje o código de error que debe recibir el
   Operador en un conflicto de asignación? [Measurability, Contracts §Asignaciones]
-- [ ] CHK012 - ¿Se contempla la concurrencia entre un cambio de estado operativo de
+- [x] CHK012 - ¿Se contempla la concurrencia entre un cambio de estado operativo de
   unidad (a "fuera de servicio") y una asignación en curso sobre esa misma unidad? [Coverage, Gap] →
-  Diferido: la regla general está en Assumptions (reasignar sin perder historial), pero
-  el detalle fino se deja como hallazgo para `/speckit-analyze` antes de Implement.
+  Revisado en Polish: la Assumption ("reasignar sin perder historial") ya es suficiente
+  para el alcance del MVP — `CambiarEstadoOperativoUnidadCommand` no reasigna
+  automáticamente (comportamiento correcto: el Operador decide manualmente),
+  `EventoAuditoria` registra el cambio, y ninguna `Asignacion` se pierde ni se corrompe.
+  No se requiere lógica adicional; se acepta explícitamente sin cambios de código.
 
 ## Validaciones
 
@@ -78,14 +82,20 @@ que el requisito, tal como está escrito, es claro/completo/consistente.
 ## Comportamiento del Mapa
 
 - [ ] CHK019 - ¿Se especifica qué debe mostrar el mapa cuando no hay emergencias activas
-  o no hay unidades disponibles (estado vacío)? [Gap, Edge Case] → Diferido: baja
-  prioridad para una demo en aula con datos siempre precargados; revisar si el alcance
-  se amplía más allá del MVP.
+  o no hay unidades disponibles (estado vacío)? [Gap, Edge Case] → **Aceptado como fuera
+  de alcance del MVP** (decisión final de Polish, 2026-09-26): la demo en aula siempre
+  corre con datos precargados (seed); no se implementará un estado vacío dedicado salvo
+  que el proyecto se extienda más allá del curso.
 - [x] CHK020 - ¿Está definido el tiempo máximo aceptable entre el registro de una
   emergencia y su aparición en el mapa? [Measurability, Spec §SC-002]
 - [ ] CHK021 - ¿Se especifica cómo se distinguen visualmente los distintos tipos de
-  unidad y estados de emergencia en el mapa? [Gap] → Diferido: detalle de diseño visual,
-  se resuelve durante Implement con los íconos/colores disponibles en CoreUI + Leaflet.
+  unidad y estados de emergencia en el mapa? [Gap] → **Aceptado parcialmente**
+  (decisión final de Polish, 2026-09-26): el mapa ya distingue emergencias de unidades
+  con un ícono propio por tipo de marcador (`MapaComponent`), pero no distingue entre
+  sí los 3 tipos de unidad ni los 7 estados de emergencia con colores/íconos propios —
+  se deja fuera de alcance del MVP; el color por estado/prioridad ya implementado
+  (FR-023) en listado/detalle/dashboard cubre la necesidad principal de consistencia
+  visual sin requerir además distinción en el mapa.
 
 ## Actualización en Tiempo Real
 
@@ -93,8 +103,11 @@ que el requisito, tal como está escrito, es claro/completo/consistente.
   dashboard se actualicen sin recarga manual? [Completeness, Contracts §Eventos SignalR]
 - [ ] CHK023 - ¿Se define el comportamiento esperado si la conexión en tiempo real se
   pierde temporalmente (reconexión, estado "desactualizado")? [Gap, Exception Flow] →
-  Diferido: SignalR reconecta automáticamente por defecto; se documentará como tarea de
-  endurecimiento (`/speckit-converge`) si aparece en pruebas, no bloquea el MVP.
+  **Sigue diferido, no aplicable todavía** (decisión final de Polish, 2026-09-26): el
+  cliente SignalR del frontend (T017) nunca se completó en esta sesión — el hub
+  existe en el backend (`OperacionesHub`) pero el frontend no se suscribe a sus
+  eventos, así que no hay conexión en vivo que pueda perderse. Se convierte en
+  hallazgo real para `/speckit-converge`, no en un ítem de checklist resuelto.
 - [x] CHK024 - ¿Es consistente el criterio de éxito SC-006 con los eventos
   `EmergenciaActualizada`/`UnidadActualizada` definidos en el plan? [Consistency]
 
@@ -110,9 +123,9 @@ que el requisito, tal como está escrito, es claro/completo/consistente.
 
 ## Errores y Casos Borde
 
-- [ ] CHK028 - ¿Están cubiertos en la especificación los casos borde de unidad "fuera de
-  servicio" durante una atención en curso? [Coverage, Spec Edge Cases] → Diferido:
-  mismo hallazgo que CHK012, se lleva junto como entrada a `/speckit-analyze`.
+- [x] CHK028 - ¿Están cubiertos en la especificación los casos borde de unidad "fuera de
+  servicio" durante una atención en curso? [Coverage, Spec Edge Cases] → Resuelto en
+  Polish: mismo hallazgo que CHK012, aceptado sin cambios de código (ver nota ahí).
 - [x] CHK029 - ¿Se especifica el comportamiento del sistema ante datos de reportante
   incompletos (nombre o contacto vacío)? [Gap] → Resuelto: FR-019 (nombre obligatorio,
   contacto opcional).
@@ -137,9 +150,12 @@ que el requisito, tal como está escrito, es claro/completo/consistente.
 - `/speckit-implement` lee el estado de estos checkboxes como gate y no debe modificarlos.
 - `checklists/requirements.md` es un checklist distinto, con ciclo de vida propio
   mantenido por `/speckit-specify` y `/speckit-clarify`.
-- **Resultado de la revisión (2026-09-26): 27/33 ítems pasan.** Los 6 que quedan
-  intencionalmente sin marcar son de bajo impacto para un MVP de demostración en aula
-  y se llevan explícitamente como entrada de `/speckit-analyze`:
-  CHK001 (transiciones prohibidas no exhaustivas), CHK012/CHK028 (concurrencia
-  unidad "fuera de servicio" durante atención en curso), CHK019 (estado vacío del
-  mapa), CHK021 (distinción visual en el mapa), CHK023 (reconexión SignalR).
+- **Resultado inicial (tras Analyze, antes de Implement): 27/33 ítems pasan.**
+- **Resultado final (Polish, 2026-09-26): 30/33 ítems pasan.** CHK001, CHK012 y CHK028
+  se resolvieron durante Implement/Polish (ver notas en cada ítem). Quedan 3 sin marcar,
+  con disposición final explícita en vez de quedar simplemente "diferidos":
+  - **CHK019** y **CHK021**: aceptados como fuera de alcance del MVP (decisión de
+    producto, no requieren código).
+  - **CHK023**: sigue diferido porque depende de una tarea real no completada
+    (cliente SignalR del frontend, T017) — se traslada como hallazgo a
+    `/speckit-converge`, no se cierra aquí.

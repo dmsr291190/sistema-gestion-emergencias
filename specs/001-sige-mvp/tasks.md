@@ -263,10 +263,10 @@ en tiempo de ejecución. Verificado con `curl`: `POST /api/Emergencias` con
 **Purpose**: pruebas y datos demo adicionales + endurecimiento y correcciones finales
 (puntos 11–12 del recorrido vertical, guía §12)
 
-- [ ] T056 Ejecutar manualmente el escenario de `quickstart.md` de punta a punta y registrar el resultado en la Bitácora
-- [ ] T057 [P] Revisar que ningún secreto quede versionado (`.env`, cadena de conexión MySQL) — Principio "Restricciones Técnicas y de Calidad" de `constitution.md`
-- [ ] T059 Resolver los hallazgos diferidos del checklist `mvp-quality.md` que sigan abiertos tras `/speckit-analyze` (CHK001, CHK012/CHK028, CHK019, CHK021, CHK023)
-- [ ] T060 Ejecutar toda la suite de pruebas (`dotnet test`, pruebas Angular) y corregir fallos antes de `/speckit-converge`
+- [x] T056 Ejecutado manualmente el escenario de `quickstart.md` de punta a punta con `curl` contra MySQL real, con datos nuevos (no reutilizados de US1–US5): los 10 pasos del escenario principal y la prueba de concurrencia FR-007 pasaron — ver detalle en `quickstart.md` y en la Bitácora
+- [x] T057 [P] **Hallazgo real corregido**: la contraseña real de MySQL (`SigeApp123!`) estaba commiteada en `backend/src/Web/appsettings.json` desde el primer commit de Implement. Se movió a `appsettings.Development.json` (ahora en `.gitignore`), `appsettings.json` trackeado quedó con placeholders `CHANGE_ME`; se quitó también la contraseña hardcodeada de `FunctionalTestSetup.cs` (ahora exige la variable de entorno sin valor por defecto)
+- [x] T059 Hallazgos diferidos del checklist resueltos: **CHK001** (FR-016 ahora prohíbe explícitamente retroceder/repetir estado, implementado y probado desde US4), **CHK012/CHK028** (revisados: la Assumption existente ya cubre el caso sin necesitar código nuevo). **CHK019/CHK021** aceptados como fuera de alcance del MVP (decisión de producto). **CHK023** permanece diferido y se traslada como hallazgo real a `/speckit-converge` (depende de T017, cliente SignalR del frontend, nunca completado) — checklist final: **30/33**
+- [x] T060 Suite de pruebas ejecutada: backend `dotnet test` **21/21** (`Domain.UnitTests`, `Infrastructure.IntegrationTests` y `Application.FunctionalTests` no tienen clases de prueba todavía, ya documentado); frontend `ng test --browsers=ChromeHeadless` **1/1** tras corregir un fallo real: `app.spec.ts` (el placeholder del scaffold) buscaba un `<h1>` que ya no existe porque `app.html` se reemplazó por `<router-outlet>` desde el Paso 1 — nadie había corrido las pruebas de Angular hasta ahora en toda la sesión
 
 ---
 
