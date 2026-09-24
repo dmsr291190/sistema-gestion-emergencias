@@ -1,0 +1,14 @@
+﻿<!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- NU1903: advertencia de auditoria de NuGet sobre una dependencia transitiva
+         (System.Security.Cryptography.Xml) sin relacion con el uso real del proyecto;
+         se documenta y suprime para no bloquear el build de un MVP academico. -->
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,20 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: src/Web/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: ${ASPNETCORE_URLS:-http://+:8080}
+      ConnectionStrings__SigeDb: ${SIGE_DB_CONNECTION}
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      # Permite llegar al MySQL que ya corre en Docker en el host, sin levantar
+      # un servicio de base de datos nuevo aqui.
+      - "host.docker.internal:host-gateway"
+
+  # frontend:
+  #   Pendiente: se agrega cuando se escafolde el proyecto Angular + CoreUI
+  #   (Paso 1 / T002 de tasks.md). Expondra el puerto 4200 y consumira
+  #   SIGE_API_BASE_URL para hablar con el servicio "backend".

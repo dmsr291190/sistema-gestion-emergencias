@@ -29,13 +29,13 @@ el recorrido vertical de la guía (estructura → dominio → auth → emergenci
 
 **Purpose**: estructura base y ejecución local (punto 1 del recorrido vertical, guía §12)
 
-- [ ] T001 Escafoldar backend con la plantilla Jason Taylor (`dotnet new ca-sln -o backend`), verificando que se generan `backend/src/Domain`, `backend/src/Application`, `backend/src/Infrastructure`, `backend/src/Web` y sus proyectos de test
-- [ ] T002 Escafoldar frontend Angular e instalar CoreUI (`ng new frontend`, `ng add @coreui/angular`), verificando el layout base (`DefaultLayoutComponent`, `_nav.ts`) en `frontend/src/app/layout`
-- [ ] T003 Crear `docker-compose.yml` en la raíz que orquesta `backend` y `frontend` y se conecta al contenedor MySQL ya existente vía variables de entorno (no define un nuevo servicio de BD)
-- [ ] T004 [P] Crear `.env.example` en la raíz con la cadena de conexión a MySQL y demás variables, sin secretos reales
-- [ ] T005 [P] Configurar linting/formato: `dotnet format` para backend, ESLint + Prettier para frontend
+- [x] T001 Escafoldar backend con la plantilla Jason Taylor (`dotnet new ca-sln -o backend`), verificando que se generan `backend/src/Domain`, `backend/src/Application`, `backend/src/Infrastructure`, `backend/src/Web` y sus proyectos de test — se usó `--client-framework None --database sqlserver` (más cercano a MySQL) y se eliminó el AppHost/TestAppHost de Aspire (orquestaba su propio SQL Server; no aplica porque MySQL ya corre externamente)
+- [x] T002 Escafoldar frontend Angular e instalar CoreUI (`ng new frontend`, `ng add @coreui/angular`) — `DefaultLayoutComponent` creado en `frontend/src/app/layout/default-layout/`; en vez de un `c-sidebar` + `_nav.ts` se usó una barra superior (`c-header`+`c-nav`) para evitar apostar a APIs de CoreUI no verificadas; vistas placeholder creadas para las 5 pantallas
+- [x] T003 Crear `docker-compose.yml` en la raíz que orquesta `backend` (con Dockerfile propio) y se conecta al contenedor MySQL ya existente vía `host.docker.internal`; el servicio `frontend` queda comentado hasta dockerizarlo
+- [x] T004 [P] Crear `.env.example` en la raíz con la cadena de conexión a MySQL y demás variables, sin secretos reales
+- [ ] T005 [P] Configurar linting/formato: `dotnet format` para backend, ESLint + Prettier para frontend — pendiente; el backend solo tiene el `.editorconfig` de la plantilla
 
-**Checkpoint**: `docker compose up --build` levanta backend y frontend vacíos, conectados al MySQL existente.
+**Checkpoint**: backend verificado end-to-end contra MySQL real (ver bitácora); `docker compose up --build` del backend pendiente de probar (falta el servicio frontend).
 
 ---
 
@@ -44,21 +44,21 @@ el recorrido vertical de la guía (estructura → dominio → auth → emergenci
 **Purpose**: modelo de dominio y persistencia + autenticación/roles mínimos (puntos 2–3
 del recorrido vertical). Bloquea todas las historias de usuario.
 
-- [ ] T006 [P] Crear entidad `Emergencia` en `backend/src/Domain/Entities/Emergencia.cs` con los campos de `data-model.md` (Tipo, Descripcion, Latitud, Longitud, Prioridad, FechaHoraReporte, ReportanteNombre obligatorio, ReportanteContacto opcional — FR-019, Estado, CreadoPor)
-- [ ] T007 [P] Crear entidad `UnidadRespuesta` en `backend/src/Domain/Entities/UnidadRespuesta.cs` (Tipo: Ambulancia/Bomberos/Patrullero, Identificador, EstadoOperativo: Disponible/Ocupada/FueraDeServicio, Latitud, Longitud, RowVersion para concurrencia optimista — FR-007)
-- [ ] T008 [P] Crear entidad `Asignacion` en `backend/src/Domain/Entities/Asignacion.cs` (EmergenciaId, UnidadId, EstadoAsignacion: despachada/en ruta/en el lugar/atendida — FR-016, AsignadoPor, FechaHoraAsignacion)
-- [ ] T009 [P] Crear entidades `Usuario` (`backend/src/Domain/Entities/Usuario.cs`, Rol: Operador/Supervisor) y `EventoAuditoria` (`backend/src/Domain/Entities/EventoAuditoria.cs`, con EmergenciaId/UnidadId nullable, TipoEvento, EstadoAnterior/EstadoNuevo, UsuarioId, FechaHora — FR-010)
-- [ ] T010 Configurar `DbContext` y migraciones EF Core con proveedor `Pomelo.EntityFrameworkCore.MySql` en `backend/src/Infrastructure/Persistence` (depende de T006–T009)
-- [ ] T011 Configurar autenticación JWT (emisión de token con claim de rol) y política de autorización por rol (`[Authorize(Roles = "Supervisor")]`) en `backend/src/Web`
-- [ ] T012 Endpoint `POST /auth/login` en `backend/src/Web/Controllers/AuthController.cs` (depende de T009, T011)
-- [ ] T013 Configurar hub SignalR `OperacionesHub` en `backend/src/Web/Hubs/OperacionesHub.cs` con los eventos `EmergenciaActualizada` y `UnidadActualizada` (contracts/rest-api.md)
-- [ ] T014 Configurar middleware de manejo centralizado de errores (mapea rechazos de negocio, p. ej. `UNIDAD_NO_DISPONIBLE`, a `409 Conflict`) en `backend/src/Web`
-- [ ] T015 [P] Seed de datos demo: 1 usuario Operador, 1 Supervisor, y 3 unidades (ambulancia, bomberos, patrullero) en estado Disponible, en `backend/src/Infrastructure/Persistence/Seed`
-- [ ] T016 [P] Configurar cliente HTTP + interceptor de JWT + guard de rol en `frontend/src/app/core` (servicios `AuthService`, `RoleGuard`)
-- [ ] T017 [P] Configurar cliente SignalR compartido (`OperacionesHubService`) en `frontend/src/app/core/services/operaciones-hub.service.ts`
-- [ ] T018 [US*] Pantalla de Login por rol en `frontend/src/app/views/auth/login` (consume T012)
+- [x] T006 [P] Crear entidad `Emergencia` en `backend/src/Domain/Entities/Emergencia.cs` con los campos de `data-model.md` (Tipo, Descripcion, Latitud, Longitud, Prioridad, FechaHoraReporte, ReportanteNombre obligatorio, ReportanteContacto opcional — FR-019, Estado, CreadoPor)
+- [x] T007 [P] Crear entidad `UnidadRespuesta` en `backend/src/Domain/Entities/UnidadRespuesta.cs` (Tipo: Ambulancia/Bomberos/Patrullero, Identificador, EstadoOperativo: Disponible/Ocupada/FueraDeServicio, Latitud, Longitud) — **sin columna `RowVersion`**: MySQL no tiene un equivalente directo al rowversion de SQL Server; FR-007 se implementará con relectura transaccional en T038, no con un token de concurrencia dedicado (ver `data-model.md`)
+- [x] T008 [P] Crear entidad `Asignacion` en `backend/src/Domain/Entities/Asignacion.cs` (EmergenciaId, UnidadId, EstadoAsignacion: despachada/en ruta/en el lugar/atendida — FR-016, AsignadoPor, FechaHoraAsignacion)
+- [x] T009 [P] Crear entidad `EventoAuditoria` en `backend/src/Domain/Entities/EventoAuditoria.cs` (EmergenciaId/UnidadId nullable, TipoEvento, EstadoAnterior/EstadoNuevo, UsuarioId, FechaHora — FR-010). "Usuario" no es una entidad propia: se usa `ApplicationUser` de ASP.NET Core Identity (ya incluido en la plantilla) con roles `Operador`/`Supervisor` (`Domain/Constants/Roles.cs`)
+- [x] T010 Configurar `DbContext` y migraciones EF Core con proveedor `Pomelo.EntityFrameworkCore.MySql` en `backend/src/Infrastructure/Data` (nombre de carpeta de la plantilla; no "Persistence") — migración `InitialCreate` generada y aplicada con `Database.MigrateAsync()`, verificada contra MySQL real (tabla `__EFMigrationsHistory` presente)
+- [x] T011 Autenticación configurada vía **ASP.NET Core Identity Bearer Tokens** (`AddBearerToken`, ya en la plantilla) en vez de un servicio JWT hecho a mano; roles `Operador`/`Supervisor` sembrados. Falta aplicar `[Authorize(Roles = "Supervisor")]` a endpoints concretos — se hace junto con cada endpoint en las fases US2/US4
+- [ ] T012 Login: la plantilla ya expone `POST /api/Users/login` vía `MapIdentityApi<ApplicationUser>()` (`Web/Endpoints/Users.cs`) — **no se creó un `AuthController` propio ni se probó este endpoint todavía**; queda pendiente de verificación end-to-end
+- [ ] T013 Hub SignalR `OperacionesHub` — **no creado todavía**
+- [ ] T014 Middleware de error de negocio → `409 Conflict` (`UNIDAD_NO_DISPONIBLE`) — **no creado todavía**; la plantilla solo tiene el `ProblemDetailsExceptionHandler` genérico
+- [x] T015 [P] Seed de datos demo en `backend/src/Infrastructure/Data/ApplicationDbContextInitialiser.cs`: 1 Operador, 1 Supervisor, 3 unidades (AMB-01, BOM-01, PAT-01) disponibles — **verificado con una consulta directa a MySQL**, ver bitácora
+- [ ] T016 [P] Cliente HTTP + interceptor JWT + guard de rol en `frontend/src/app/core` — **no creado todavía**
+- [ ] T017 [P] Cliente SignalR compartido en frontend — **no creado todavía**
+- [ ] T018 [US*] Pantalla de Login: existe un placeholder estático en `frontend/src/app/views/auth/login/login.component.ts`, **sin conectar** a T012
 
-**Checkpoint**: login funciona, base de datos migrada con datos demo, hub SignalR arriba. Ninguna historia de usuario puede avanzar sin esto.
+**Checkpoint parcial**: modelo de datos, persistencia y seed verificados end-to-end contra MySQL real. Login, SignalR y los guards de rol del frontend quedan pendientes antes de poder dar por cerrada la Fase 2 por completo.
 
 ---
 

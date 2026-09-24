@@ -6,7 +6,7 @@ Extraído de `spec.md` (Key Entities) y de las decisiones de `research.md`.
 
 | Campo | Tipo | Notas |
 |---|---|---|
-| Id | Guid | PK |
+| Id | int | PK autonumérico (convención de la plantilla Jason Taylor) |
 | Tipo | string | Ej. médica, incendio, seguridad (catálogo simple) |
 | Descripcion | string | Obligatorio (FR-001, FR-015) |
 | Latitud / Longitud | double | Obligatorios; bloquear guardado si faltan (Assumptions) |
@@ -37,18 +37,17 @@ Extraído de `spec.md` (Key Entities) y de las decisiones de `research.md`.
 
 | Campo | Tipo | Notas |
 |---|---|---|
-| Id | Guid | PK |
+| Id | int | PK autonumérico (convención de la plantilla Jason Taylor) |
 | Tipo | enum (Ambulancia/Bomberos/Patrullero) | FR-004 |
 | Identificador | string | Código visible de la unidad (ej. "AMB-03") |
 | EstadoOperativo | enum (Disponible/Ocupada/FueraDeServicio) | FR-004, FR-005 |
 | Latitud / Longitud | double | Para mostrarla en el mapa junto a las emergencias |
-| RowVersion | byte[] / token de concurrencia | Soporta la revalidación optimista de FR-007 |
 
 ## Asignacion
 
 | Campo | Tipo | Notas |
 |---|---|---|
-| Id | Guid | PK |
+| Id | int | PK autonumérico (convención de la plantilla Jason Taylor) |
 | EmergenciaId | FK Emergencia | |
 | UnidadId | FK UnidadRespuesta | |
 | EstadoAsignacion | enum | despachada → en ruta → en el lugar → atendida (progreso independiente por unidad, FR-016) |
@@ -56,23 +55,25 @@ Extraído de `spec.md` (Key Entities) y de las decisiones de `research.md`.
 | FechaHoraAsignacion | datetime (UTC) | |
 
 **Regla de unicidad/disponibilidad**: al confirmar una `Asignacion`, el backend
-revalida en la misma transacción que `UnidadRespuesta.EstadoOperativo == Disponible`;
-si no, rechaza con error de negocio (FR-007) — ver `research.md` §4.
+revalida — dentro de la misma transacción, releyendo el estado justo antes de escribir
+(sin columna de concurrencia dedicada; MySQL no tiene un equivalente directo al
+`rowversion` de SQL Server) — que `UnidadRespuesta.EstadoOperativo == Disponible`; si
+no, rechaza con error de negocio (FR-007) — ver `research.md` §4.
 
 ## Usuario
 
 | Campo | Tipo | Notas |
 |---|---|---|
-| Id | Guid | PK |
+| Id | string | PK (ASP.NET Core Identity `ApplicationUser`, no una tabla propia) |
 | NombreUsuario | string | Login |
-| PasswordHash | string | Nunca en texto plano |
-| Rol | enum (Operador/Supervisor) | FR-012, FR-017 |
+| PasswordHash | string | Gestionado por Identity, nunca en texto plano |
+| Rol | enum (Operador/Supervisor) | FR-012, FR-017 — vía `IdentityRole` |
 
 ## EventoAuditoria (Timeline)
 
 | Campo | Tipo | Notas |
 |---|---|---|
-| Id | Guid | PK |
+| Id | int | PK autonumérico (convención de la plantilla Jason Taylor) |
 | EmergenciaId | FK Emergencia | Nullable si el evento es sobre una Unidad sin emergencia asociada |
 | UnidadId | FK UnidadRespuesta (nullable) | |
 | TipoEvento | string | Ej. "EmergenciaCreada", "EmergenciaValidada", "UnidadAsignada", "CambioEstado", "EmergenciaCerrada", "EmergenciaReabierta" |
