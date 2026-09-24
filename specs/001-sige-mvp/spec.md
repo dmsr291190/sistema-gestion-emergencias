@@ -196,6 +196,11 @@ en cada formulario, sin necesidad de un flujo de negocio completo.
 5. **Given** un usuario que navega solo con teclado, **When** recorre el formulario
    de "Nueva emergencia" con Tab, **Then** el orden de foco sigue el orden visual de
    los campos y el botón de enviar es alcanzable sin usar el mouse.
+6. **Given** los formularios del MVP (login, nueva emergencia, alta de unidad,
+   despacho), **When** se comparan entre sí, **Then** cada campo sigue la misma
+   estructura de presentación (etiqueta, control y mensaje de error en la misma
+   posición relativa) y ese patrón está implementado como un componente reutilizable,
+   no repetido con marcado HTML distinto en cada pantalla.
 
 ---
 
@@ -294,6 +299,10 @@ en cada formulario, sin necesidad de un flujo de negocio completo.
   detalle, dashboard).
 - **FR-024**: Los formularios del MVP MUST poder completarse y enviarse navegando
   únicamente con teclado, siguiendo el orden visual de los campos.
+- **FR-025**: Los campos de los formularios del MVP MUST presentarse mediante un
+  único componente de campo reutilizable (etiqueta, control y mensaje de error en la
+  misma estructura), en vez de que cada pantalla repita su propio marcado HTML para
+  lo mismo.
 
 ### Key Entities
 

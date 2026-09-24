@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -7,12 +7,13 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { EmergenciasService } from '../../../core/services/emergencias.service';
 import { EmergenciaDetalle, EstadoAsignacion, EstadoEmergencia } from '../../../core/models/emergencia.model';
+import { ESTADO_ASIGNACION_LABEL, ESTADO_EMERGENCIA_COLOR, ESTADO_EMERGENCIA_LABEL } from '../../../core/models/labels';
 
 // US1 (detalle), US4 (avance de estado, cierre/reapertura, timeline — FR-008, FR-016, FR-017, FR-018).
 @Component({
   selector: 'app-emergencia-detalle',
   standalone: true,
-  imports: [DatePipe, RouterLink, CardComponent, CardHeaderComponent, CardBodyComponent],
+  imports: [DatePipe, NgClass, RouterLink, CardComponent, CardHeaderComponent, CardBodyComponent],
   template: `
     @if (emergencia(); as e) {
       <c-card>
@@ -40,7 +41,7 @@ import { EmergenciaDetalle, EstadoAsignacion, EstadoEmergencia } from '../../../
           <p>{{ e.descripcion }}</p>
           <p><strong>Reportante:</strong> {{ e.reportanteNombre }} @if (e.reportanteContacto) { ({{ e.reportanteContacto }}) }</p>
           <p><strong>Ubicacion:</strong> {{ e.latitud }}, {{ e.longitud }}</p>
-          <p><strong>Estado actual:</strong> {{ estadoLabel[e.estado] }}</p>
+          <p><strong>Estado actual:</strong> <span [ngClass]="'text-' + estadoColor[e.estado]">{{ estadoLabel[e.estado] }}</span></p>
 
           @if (error()) {
             <div class="alert alert-danger py-2">{{ error() }}</div>
@@ -88,10 +89,9 @@ export class EmergenciaDetalleComponent implements OnInit {
   readonly EstadoEmergencia = EstadoEmergencia;
   readonly EstadoAsignacion = EstadoAsignacion;
 
-  readonly estadoLabel = {
-    0: 'Reportada', 1: 'Validada', 2: 'Despachada', 3: 'En ruta', 4: 'En el lugar', 5: 'Atendida', 6: 'Cerrada'
-  };
-  readonly asignacionLabel = { 0: 'Despachada', 1: 'En ruta', 2: 'En el lugar', 3: 'Atendida' };
+  readonly estadoLabel = ESTADO_EMERGENCIA_LABEL;
+  readonly estadoColor = ESTADO_EMERGENCIA_COLOR;
+  readonly asignacionLabel = ESTADO_ASIGNACION_LABEL;
 
   constructor(
     private readonly route: ActivatedRoute,

@@ -62,7 +62,13 @@ public class ProblemDetailsExceptionHandler : IExceptionHandler
         }
         else
         {
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            // BUG real (FR-021): `problemDetails` tiene tipo estatico ProblemDetails
+            // (una de las ramas del switch lo castea explicitamente), asi que
+            // WriteAsJsonAsync(problemDetails, ...) serializaba usando ese tipo
+            // estatico y descartaba silenciosamente el diccionario `errors` de
+            // ValidationProblemDetails — el frontend nunca recibia los mensajes por
+            // campo. Se corrige pasando el tipo en tiempo de ejecucion explicitamente.
+            await httpContext.Response.WriteAsJsonAsync(problemDetails, problemDetails.GetType(), cancellationToken);
         }
 
         return true;

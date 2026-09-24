@@ -219,21 +219,40 @@ conjunto, verificadas end-to-end contra MySQL real.
 ## Phase 8: User Story 6 - Experiencia de uso clara, consistente y responsiva (Priority: P3)
 
 **Goal**: cada pantalla es legible en anchos de aula, cada acción crítica da retroalimentación
-clara, los estados/prioridades se ven igual en todas las vistas, y los formularios son
-navegables por teclado (FR-020 a FR-024, SC-007). Agregada como historia de usuario a
-petición de Diego durante Implement — ver bitácora.
+clara, los estados/prioridades se ven igual en todas las vistas, los formularios son
+navegables por teclado, y comparten un único componente de campo reutilizable en vez
+de repetir marcado (FR-020 a FR-025, SC-007). Agregada como historia de usuario a
+petición de Diego durante Implement; FR-025 (organización de los componentes de
+formulario) se agregó despues, también a pedido de Diego — ver bitácora.
 
 **Independent Test**: abrir cada pantalla a 1024px de ancho y forzar un error de validación
 en cada formulario, sin depender de un flujo de negocio completo.
 
 ### Implementación de User Story 6
 
-- [ ] T061 [P] [US6] Revisar el layout responsivo (grid de CoreUI) de las 6 pantallas a 1024px de ancho; ajustar donde se rompa (FR-020)
-- [ ] T062 [P] [US6] Mostrar el mensaje de error de FluentValidation junto al campo correspondiente en los formularios de login, nueva emergencia y alta de unidad, en español y específico (FR-021)
-- [ ] T063 [P] [US6] Agregar estado "cargando"/deshabilitado en los botones de crear, validar, asignar, cambiar estado, cerrar y reabrir, para evitar envíos duplicados (FR-022)
-- [ ] T064 [P] [US6] Definir un mapeo único de etiqueta/color por `EstadoEmergencia` y `Prioridad` (constante o servicio compartido en `frontend/src/app/core`) y reutilizarlo en listado, mapa, detalle y dashboard, reemplazando los objetos `estadoLabel`/`prioridadLabel` duplicados por componente (FR-023)
-- [ ] T065 [US6] Verificar el orden de tabulación del formulario "Nueva emergencia" y corregirlo si no sigue el orden visual (FR-024)
-- [ ] T066 [US6] Prueba manual: recorrer las 6 pantallas a 1024px y forzar un error en cada formulario; registrar el resultado en la Bitácora (verificación de SC-007)
+- [x] T060b [US6] Componente `app-form-field` (etiqueta + control proyectado vía `<ng-content>` + mensaje de error) en `frontend/src/app/shared/form-field/form-field.component.ts`; login, nueva emergencia, alta de unidad y despacho refactorizados para usarlo en vez de repetir `form-label`/`form-control` (FR-025)
+- [x] T061 [P] [US6] Layout responsivo revisado: los 4 formularios y las 6 pantallas ya usaban el grid de Bootstrap/CoreUI (`col-md-*`, que colapsa a ancho completo bajo el breakpoint `md`); no se encontraron tablas sin envoltura ni anchos fijos que rompan a 1024px — no fue necesario ningún ajuste nuevo (FR-020)
+- [x] T062 [P] [US6] Mensajes de FluentValidation traducidos a español y específicos en `CrearEmergenciaCommandValidator` y `CrearUnidadCommandValidator` (`.WithMessage(...)`); mostrados junto al campo vía `extraerErroresPorCampo()` + `app-form-field` en los 3 formularios que llaman a la API (FR-021). **Bug real encontrado y corregido**: ver nota abajo
+- [x] T063 [P] [US6] Estado "cargando"/deshabilitado ya existía en todos los botones de acción crítica desde que se implementó cada historia (US1–US5); no fue necesario agregar nada nuevo, solo se verificó que ningún botón quedara sin ese estado (FR-022)
+- [x] T064 [P] [US6] `frontend/src/app/core/models/labels.ts`: mapas únicos de etiqueta y color por `EstadoEmergencia`, `Prioridad`, `EstadoAsignacion`, `TipoUnidad` y `EstadoOperativoUnidad` (más una variante indexada por nombre de string para el dashboard, que agrupa por el nombre del enum, no por su valor numérico). Los objetos `estadoLabel`/`prioridadLabel`/`tipoLabel` duplicados en `emergencias`, `unidades`, `despacho`, `emergencia-detalle` y `dashboard` se reemplazaron por estas constantes; se agregó color consistente (`[ngClass]="'text-' + color[...]"`) en el listado, el detalle y el dashboard (FR-023)
+- [x] T065 [US6] Orden de tabulación de "Nueva emergencia" revisado: ya sigue el orden visual del DOM (tipo → descripción → latitud → longitud → prioridad → nombre → contacto → botón); no requirió `tabindex` manual (FR-024)
+- [ ] T066 [US6] Prueba manual de recorrido a 1024px en un navegador real — **no realizada en esta sesión** (sin herramienta de captura/browser disponible); pendiente de que Diego la haga abriendo `http://localhost:4400` con la ventana angosta (verificación de SC-007)
+
+**Bug real encontrado y corregido en T062** (antes de que el frontend pudiera mostrar
+ningún mensaje por campo): en `ProblemDetailsExceptionHandler.cs`, la variable
+`problemDetails` resultante del `switch` tiene tipo estático `ProblemDetails` (una de
+las ramas la castea explícitamente a ese tipo para poder unificar los tipos del
+`switch`), aunque en tiempo de ejecución el objeto real para errores de validación es
+un `ValidationProblemDetails` (que agrega el diccionario `Errors`). Como
+`WriteAsJsonAsync(problemDetails, ...)` usa el tipo *estático* para decidir qué
+serializar, el JSON de salida **nunca incluía el diccionario `errors`** — el
+`400 Bad Request` solo traía `type`/`title`/`status`, sin ningún detalle por campo. El
+bug pasó inadvertido en US1–US5 porque nunca se inspeccionó el cuerpo completo de un
+error 400 con `curl`, solo el código de estado. Se corrigió pasando explícitamente
+`problemDetails.GetType()` a `WriteAsJsonAsync`, forzando la serialización por el tipo
+en tiempo de ejecución. Verificado con `curl`: `POST /api/Emergencias` con
+`descripcion` y `reportanteNombre` vacíos ahora devuelve
+`{"errors":{"Descripcion":["La descripcion es obligatoria."],"ReportanteNombre":["El nombre del reportante es obligatorio."]}}`.
 
 **Checkpoint**: el MVP es demostrable y comprensible en un proyector de aula sin explicación técnica adicional (SC-005, SC-007).
 

@@ -1,15 +1,22 @@
+import { NgClass } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CardBodyComponent, CardComponent, CardHeaderComponent } from '@coreui/angular';
 import { EmergenciasService } from '../../core/services/emergencias.service';
-import { CrearEmergenciaRequest, Emergencia, EstadoEmergencia, Prioridad } from '../../core/models/emergencia.model';
+import { extraerErroresPorCampo } from '../../core/utils/validation-errors';
+import { FormFieldComponent } from '../../shared/form-field/form-field.component';
+import { CrearEmergenciaRequest, Emergencia, Prioridad } from '../../core/models/emergencia.model';
+import { ESTADO_EMERGENCIA_COLOR, ESTADO_EMERGENCIA_LABEL, PRIORIDAD_LABEL } from '../../core/models/labels';
 
 // US1: registrar y visualizar una emergencia (FR-001, FR-002, FR-015, FR-019).
+// FR-021, FR-022, FR-025: validacion por campo, boton con estado de carga, y
+// estructura de campo compartida (app-form-field) — Historia de Usuario 6.
 @Component({
   selector: 'app-emergencias',
   standalone: true,
-  imports: [FormsModule, RouterLink, CardComponent, CardHeaderComponent, CardBodyComponent],
+  imports: [NgClass, FormsModule, RouterLink, CardComponent, CardHeaderComponent, CardBodyComponent, FormFieldComponent],
   template: `
     <div class="row g-4">
       <div class="col-md-5">
@@ -17,43 +24,40 @@ import { CrearEmergenciaRequest, Emergencia, EstadoEmergencia, Prioridad } from 
           <c-card-header>Nueva emergencia</c-card-header>
           <c-card-body>
             <form (ngSubmit)="crear()">
-              <div class="mb-2">
-                <label class="form-label">Tipo</label>
+              <app-form-field label="Tipo" [error]="errores()['tipo']">
                 <input class="form-control" name="tipo" [(ngModel)]="form.tipo" required />
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Descripcion</label>
+              </app-form-field>
+              <app-form-field label="Descripcion" [error]="errores()['descripcion']">
                 <textarea class="form-control" name="descripcion" [(ngModel)]="form.descripcion" required></textarea>
-              </div>
+              </app-form-field>
               <div class="row">
-                <div class="col-6 mb-2">
-                  <label class="form-label">Latitud</label>
-                  <input class="form-control" type="number" step="0.0001" name="latitud" [(ngModel)]="form.latitud" required />
+                <div class="col-6">
+                  <app-form-field label="Latitud" [error]="errores()['latitud']">
+                    <input class="form-control" type="number" step="0.0001" name="latitud" [(ngModel)]="form.latitud" required />
+                  </app-form-field>
                 </div>
-                <div class="col-6 mb-2">
-                  <label class="form-label">Longitud</label>
-                  <input class="form-control" type="number" step="0.0001" name="longitud" [(ngModel)]="form.longitud" required />
+                <div class="col-6">
+                  <app-form-field label="Longitud" [error]="errores()['longitud']">
+                    <input class="form-control" type="number" step="0.0001" name="longitud" [(ngModel)]="form.longitud" required />
+                  </app-form-field>
                 </div>
               </div>
-              <div class="mb-2">
-                <label class="form-label">Prioridad</label>
+              <app-form-field label="Prioridad" [error]="errores()['prioridad']">
                 <select class="form-select" name="prioridad" [(ngModel)]="form.prioridad">
                   <option [ngValue]="0">Baja</option>
                   <option [ngValue]="1">Media</option>
                   <option [ngValue]="2">Alta</option>
                   <option [ngValue]="3">Critica</option>
                 </select>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Nombre del reportante</label>
+              </app-form-field>
+              <app-form-field label="Nombre del reportante" [error]="errores()['reportantenombre']">
                 <input class="form-control" name="reportanteNombre" [(ngModel)]="form.reportanteNombre" required />
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Contacto del reportante (opcional)</label>
+              </app-form-field>
+              <app-form-field label="Contacto del reportante (opcional)" [error]="errores()['reportantecontacto']">
                 <input class="form-control" name="reportanteContacto" [(ngModel)]="form.reportanteContacto" />
-              </div>
-              @if (error()) {
-                <div class="alert alert-danger py-2">{{ error() }}</div>
+              </app-form-field>
+              @if (errorGeneral()) {
+                <div class="alert alert-danger py-2">{{ errorGeneral() }}</div>
               }
               <button class="btn btn-primary" type="submit" [disabled]="guardando()">
                 {{ guardando() ? 'Guardando...' : 'Registrar emergencia' }}
@@ -75,7 +79,7 @@ import { CrearEmergenciaRequest, Emergencia, EstadoEmergencia, Prioridad } from 
                   <tr>
                     <td>{{ e.tipo }}</td>
                     <td>{{ prioridadLabel[e.prioridad] }}</td>
-                    <td>{{ estadoLabel[e.estado] }}</td>
+                    <td [ngClass]="'text-' + estadoColor[e.estado]">{{ estadoLabel[e.estado] }}</td>
                     <td><a [routerLink]="['/emergencias', e.id]">Ver detalle</a></td>
                   </tr>
                 } @empty {
@@ -92,12 +96,12 @@ import { CrearEmergenciaRequest, Emergencia, EstadoEmergencia, Prioridad } from 
 export class EmergenciasComponent implements OnInit {
   readonly emergencias = signal<Emergencia[]>([]);
   readonly guardando = signal(false);
-  readonly error = signal<string | null>(null);
+  readonly errorGeneral = signal<string | null>(null);
+  readonly errores = signal<Record<string, string>>({});
 
-  readonly prioridadLabel = { 0: 'Baja', 1: 'Media', 2: 'Alta', 3: 'Critica' };
-  readonly estadoLabel = {
-    0: 'Reportada', 1: 'Validada', 2: 'Despachada', 3: 'En ruta', 4: 'En el lugar', 5: 'Atendida', 6: 'Cerrada'
-  };
+  readonly prioridadLabel = PRIORIDAD_LABEL;
+  readonly estadoLabel = ESTADO_EMERGENCIA_LABEL;
+  readonly estadoColor = ESTADO_EMERGENCIA_COLOR;
 
   form: CrearEmergenciaRequest = {
     tipo: '',
@@ -120,7 +124,8 @@ export class EmergenciasComponent implements OnInit {
   }
 
   crear(): void {
-    this.error.set(null);
+    this.errorGeneral.set(null);
+    this.errores.set({});
     this.guardando.set(true);
 
     this.emergenciasService.crear(this.form).subscribe({
@@ -132,9 +137,14 @@ export class EmergenciasComponent implements OnInit {
         };
         this.cargar();
       },
-      error: () => {
+      error: (err: HttpErrorResponse) => {
         this.guardando.set(false);
-        this.error.set('No se pudo registrar la emergencia. Revisa los campos obligatorios.');
+        const porCampo = extraerErroresPorCampo(err);
+        if (Object.keys(porCampo).length > 0) {
+          this.errores.set(porCampo);
+        } else {
+          this.errorGeneral.set('No se pudo registrar la emergencia.');
+        }
       }
     });
   }

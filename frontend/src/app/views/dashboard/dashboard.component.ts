@@ -1,7 +1,9 @@
+import { NgClass } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { CardBodyComponent, CardComponent, CardHeaderComponent, WidgetStatAComponent } from '@coreui/angular';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { DashboardIndicadores } from '../../core/models/dashboard.model';
+import { ESTADO_EMERGENCIA_COLOR_POR_NOMBRE, PRIORIDAD_COLOR_POR_NOMBRE } from '../../core/models/labels';
 
 // FR-011: dashboard con indicadores operativos basicos.
 // SC-006: se recarga al entrar a la vista; la actualizacion en vivo via SignalR
@@ -9,7 +11,7 @@ import { DashboardIndicadores } from '../../core/models/dashboard.model';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CardComponent, CardHeaderComponent, CardBodyComponent, WidgetStatAComponent],
+  imports: [NgClass, CardComponent, CardHeaderComponent, CardBodyComponent, WidgetStatAComponent],
   template: `
     <div class="row g-4 mb-4">
       <div class="col-sm-4">
@@ -33,7 +35,7 @@ import { DashboardIndicadores } from '../../core/models/dashboard.model';
             <ul class="list-group">
               @for (item of estadosOrdenados(); track item.clave) {
                 <li class="list-group-item d-flex justify-content-between">
-                  <span>{{ item.clave }}</span><strong>{{ item.valor }}</strong>
+                  <span [ngClass]="'text-' + estadoColor[item.clave]">{{ item.clave }}</span><strong>{{ item.valor }}</strong>
                 </li>
               }
             </ul>
@@ -50,7 +52,7 @@ import { DashboardIndicadores } from '../../core/models/dashboard.model';
             <ul class="list-group">
               @for (item of prioridadesOrdenadas(); track item.clave) {
                 <li class="list-group-item d-flex justify-content-between">
-                  <span>{{ item.clave }}</span><strong>{{ item.valor }}</strong>
+                  <span [ngClass]="'text-' + prioridadColor[item.clave]">{{ item.clave }}</span><strong>{{ item.valor }}</strong>
                 </li>
               }
             </ul>
@@ -62,6 +64,8 @@ import { DashboardIndicadores } from '../../core/models/dashboard.model';
 })
 export class DashboardComponent implements OnInit {
   readonly indicadores = signal<DashboardIndicadores | null>(null);
+  readonly estadoColor = ESTADO_EMERGENCIA_COLOR_POR_NOMBRE;
+  readonly prioridadColor = PRIORIDAD_COLOR_POR_NOMBRE;
 
   constructor(private readonly dashboardService: DashboardService) {}
 

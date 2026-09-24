@@ -1,16 +1,21 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CardBodyComponent, CardComponent, CardHeaderComponent } from '@coreui/angular';
 import { AuthService } from '../../core/services/auth.service';
 import { UnidadesService } from '../../core/services/unidades.service';
+import { extraerErroresPorCampo } from '../../core/utils/validation-errors';
+import { FormFieldComponent } from '../../shared/form-field/form-field.component';
 import { CrearUnidadRequest, EstadoOperativoUnidad, TipoUnidad, Unidad } from '../../core/models/unidad.model';
+import { ESTADO_OPERATIVO_UNIDAD_LABEL, TIPO_UNIDAD_LABEL } from '../../core/models/labels';
 
 // US2: administrar unidades y conocer su disponibilidad (FR-004, FR-005).
 // Alta y cambio de estado solo visibles/habilitados para el rol Supervisor.
+// FR-021, FR-025: validacion por campo y estructura de campo compartida.
 @Component({
   selector: 'app-unidades',
   standalone: true,
-  imports: [FormsModule, CardComponent, CardHeaderComponent, CardBodyComponent],
+  imports: [FormsModule, CardComponent, CardHeaderComponent, CardBodyComponent, FormFieldComponent],
   template: `
     <div class="row g-4">
       @if (auth.isSupervisor()) {
@@ -19,30 +24,30 @@ import { CrearUnidadRequest, EstadoOperativoUnidad, TipoUnidad, Unidad } from '.
             <c-card-header>Nueva unidad</c-card-header>
             <c-card-body>
               <form (ngSubmit)="crear()">
-                <div class="mb-2">
-                  <label class="form-label">Tipo</label>
+                <app-form-field label="Tipo" [error]="errores()['tipo']">
                   <select class="form-select" name="tipo" [(ngModel)]="form.tipo">
                     <option [ngValue]="0">Ambulancia</option>
                     <option [ngValue]="1">Bomberos</option>
                     <option [ngValue]="2">Patrullero</option>
                   </select>
-                </div>
-                <div class="mb-2">
-                  <label class="form-label">Identificador</label>
+                </app-form-field>
+                <app-form-field label="Identificador" [error]="errores()['identificador']">
                   <input class="form-control" name="identificador" [(ngModel)]="form.identificador" required placeholder="ej. AMB-02" />
-                </div>
+                </app-form-field>
                 <div class="row">
-                  <div class="col-6 mb-3">
-                    <label class="form-label">Latitud (opcional)</label>
-                    <input class="form-control" type="number" step="0.0001" name="latitud" [(ngModel)]="form.latitud" />
+                  <div class="col-6">
+                    <app-form-field label="Latitud (opcional)" [error]="errores()['latitud']">
+                      <input class="form-control" type="number" step="0.0001" name="latitud" [(ngModel)]="form.latitud" />
+                    </app-form-field>
                   </div>
-                  <div class="col-6 mb-3">
-                    <label class="form-label">Longitud (opcional)</label>
-                    <input class="form-control" type="number" step="0.0001" name="longitud" [(ngModel)]="form.longitud" />
+                  <div class="col-6">
+                    <app-form-field label="Longitud (opcional)" [error]="errores()['longitud']">
+                      <input class="form-control" type="number" step="0.0001" name="longitud" [(ngModel)]="form.longitud" />
+                    </app-form-field>
                   </div>
                 </div>
-                @if (error()) {
-                  <div class="alert alert-danger py-2">{{ error() }}</div>
+                @if (errorGeneral()) {
+                  <div class="alert alert-danger py-2">{{ errorGeneral() }}</div>
                 }
                 <button class="btn btn-primary" type="submit" [disabled]="guardando()">
                   {{ guardando() ? 'Guardando...' : 'Registrar unidad' }}
@@ -91,10 +96,11 @@ import { CrearUnidadRequest, EstadoOperativoUnidad, TipoUnidad, Unidad } from '.
 export class UnidadesComponent implements OnInit {
   readonly unidades = signal<Unidad[]>([]);
   readonly guardando = signal(false);
-  readonly error = signal<string | null>(null);
+  readonly errorGeneral = signal<string | null>(null);
+  readonly errores = signal<Record<string, string>>({});
 
-  readonly tipoLabel = { 0: 'Ambulancia', 1: 'Bomberos', 2: 'Patrullero' };
-  readonly estadoLabel = { 0: 'Disponible', 1: 'Ocupada', 2: 'Fuera de servicio' };
+  readonly tipoLabel = TIPO_UNIDAD_LABEL;
+  readonly estadoLabel = ESTADO_OPERATIVO_UNIDAD_LABEL;
 
   form: CrearUnidadRequest = { tipo: TipoUnidad.Ambulancia, identificador: '' };
 
@@ -112,7 +118,8 @@ export class UnidadesComponent implements OnInit {
   }
 
   crear(): void {
-    this.error.set(null);
+    this.errorGeneral.set(null);
+    this.errores.set({});
     this.guardando.set(true);
 
     this.unidadesService.crear(this.form).subscribe({
@@ -121,9 +128,14 @@ export class UnidadesComponent implements OnInit {
         this.form = { tipo: TipoUnidad.Ambulancia, identificador: '' };
         this.cargar();
       },
-      error: () => {
+      error: (err: HttpErrorResponse) => {
         this.guardando.set(false);
-        this.error.set('No se pudo registrar la unidad. Revisa el identificador.');
+        const porCampo = extraerErroresPorCampo(err);
+        if (Object.keys(porCampo).length > 0) {
+          this.errores.set(porCampo);
+        } else {
+          this.errorGeneral.set('No se pudo registrar la unidad.');
+        }
       }
     });
   }
