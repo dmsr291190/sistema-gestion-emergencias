@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,10 +31,7 @@
 
 ## Notes
 
-- Quedan 3 marcadores `[NEEDS CLARIFICATION]` en `spec.md` (Edge Cases), dentro del
-  límite máximo de 3 que permite el flujo de `/speckit-specify`. Se resuelven de forma
-  deliberada en `/speckit-clarify`, la siguiente etapa de la guía SDD, en lugar de
-  adivinarse aquí:
-  1. Regla de concurrencia al asignar la misma unidad desde dos operadores.
-  2. Multiplicidad de unidades por emergencia (una vs. varias).
-  3. Rol habilitado para cerrar/reabrir una emergencia.
+- Los 3 marcadores `[NEEDS CLARIFICATION]` se resolvieron en la etapa `/speckit-clarify`
+  (sesión 2026-09-26): regla de concurrencia al asignar unidades, multiplicidad/estado
+  independiente por unidad, y rol habilitado para cerrar/reabrir. Ver sección
+  `## Clarifications` en `spec.md`. 16/16 ítems pasan.
