@@ -26,13 +26,14 @@ en el Command de MediatR (Application), no en el endpoint.
 | POST | `/api/Emergencias/{id}/reabrir` | **[Supervisor]** Reabre una emergencia cerrada. | FR-017, FR-010 | ⏳ Pendiente (US4) |
 | PATCH | `/api/Asignaciones/{id}/estado` | Avanza el estado de una asignación (despachada→…→atendida). | FR-016 | ⏳ Pendiente (US4) |
 
-## Unidades (`/api/Unidades`) — pendiente (US2)
+## Unidades (`/api/Unidades`) — implementadas en US2
 
-| Método | Ruta prevista | Descripción | Requisitos |
-|---|---|---|---|
-| POST | `/api/Unidades` | **[Supervisor]** Crea una unidad de respuesta. | FR-004 |
-| GET | `/api/Unidades` | Lista unidades con tipo y estado operativo. | FR-004, FR-005 |
-| PATCH | `/api/Unidades/{id}/estado` | **[Supervisor]** Cambia el estado operativo. | FR-004 |
+| Método | Ruta real | Descripción | Requisitos | Estado |
+|---|---|---|---|---|
+| POST | `/api/Unidades` | **[Supervisor]** Crea una unidad de respuesta. | FR-004 | ✅ Verificado |
+| GET | `/api/Unidades` | Lista unidades con tipo y estado operativo. | FR-004, FR-005 | ✅ Verificado |
+| PATCH | `/api/Unidades/{id}/estado` | **[Supervisor]** Cambia el estado operativo; emite `UnidadActualizada`. | FR-004 | ✅ Verificado |
+| GET | `/api/Users/me` | Rol del usuario autenticado (`{ id, roles }`) — agregado porque el access token de Identity es opaco y el frontend no puede leerlo. | FR-012 | ✅ Verificado |
 
 ## Asignaciones (`/api/Asignaciones`) — pendiente (US3)
 

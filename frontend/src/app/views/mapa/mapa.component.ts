@@ -2,11 +2,12 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@ang
 import { CardBodyComponent, CardComponent, CardHeaderComponent } from '@coreui/angular';
 import * as L from 'leaflet';
 import { EmergenciasService } from '../../core/services/emergencias.service';
+import { UnidadesService } from '../../core/services/unidades.service';
 
-// FR-003: mapa operativo con las emergencias activas (Leaflet + OpenStreetMap).
+// FR-003: mapa operativo con las emergencias activas y las unidades de respuesta.
 // SC-002: la emergencia debe verse en el mapa en menos de 5 segundos tras registrarse
 // (aqui se recarga al entrar a la vista; la actualizacion en vivo via SignalR
-// queda para T017/T026 completos).
+// queda para T017 completo).
 @Component({
   selector: 'app-mapa',
   standalone: true,
@@ -23,8 +24,12 @@ import { EmergenciasService } from '../../core/services/emergencias.service';
 export class MapaComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;
   private map?: L.Map;
+  private unidadIcon?: L.Icon;
 
-  constructor(private readonly emergenciasService: EmergenciasService) {}
+  constructor(
+    private readonly emergenciasService: EmergenciasService,
+    private readonly unidadesService: UnidadesService
+  ) {}
 
   ngAfterViewInit(): void {
     // Los iconos por defecto de Leaflet se sirven desde /leaflet/ (ver angular.json assets),
@@ -33,6 +38,15 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       iconRetinaUrl: 'leaflet/marker-icon-2x.png',
       iconUrl: 'leaflet/marker-icon.png',
       shadowUrl: 'leaflet/marker-shadow.png'
+    });
+
+    this.unidadIcon = L.icon({
+      iconUrl: 'leaflet/marker-icon.png',
+      iconRetinaUrl: 'leaflet/marker-icon-2x.png',
+      shadowUrl: 'leaflet/marker-shadow.png',
+      iconSize: [20, 33],
+      iconAnchor: [10, 33],
+      className: 'sige-unidad-marker'
     });
 
     // Centro por defecto: Lima, Peru (ajustar segun la zona real de despliegue).
@@ -46,7 +60,16 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       for (const e of emergencias) {
         L.marker([e.latitud, e.longitud])
           .addTo(this.map!)
-          .bindPopup(`<strong>${e.tipo}</strong><br>${e.descripcion}`);
+          .bindPopup(`<strong>Emergencia: ${e.tipo}</strong><br>${e.descripcion}`);
+      }
+    });
+
+    this.unidadesService.listar().subscribe((unidades) => {
+      for (const u of unidades) {
+        if (u.latitud == null || u.longitud == null) continue;
+        L.marker([u.latitud, u.longitud], { icon: this.unidadIcon })
+          .addTo(this.map!)
+          .bindPopup(`<strong>Unidad: ${u.identificador}</strong>`);
       }
     });
   }

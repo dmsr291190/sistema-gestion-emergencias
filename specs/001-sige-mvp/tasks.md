@@ -100,18 +100,24 @@ del recorrido vertical). Bloquea todas las historias de usuario.
 
 ### Tests para User Story 2
 
-- [ ] T029 [P] [US2] Prueba unitaria: solo rol Supervisor puede crear/cambiar estado de una unidad (FR-004) en `backend/tests/Application.UnitTests/Unidades/AutorizacionUnidadesTests.cs`
+- [x] T029 [P] [US2] Prueba unitaria: solo rol Supervisor puede crear/cambiar estado de una unidad (FR-004) en `backend/tests/Application.UnitTests/Unidades/AutorizacionUnidadesTests.cs` — 3 casos (rechaza Operador, permite Supervisor, rechaza anónimo); 12/12 en verde
 
 ### Implementación de User Story 2
 
-- [ ] T030 [P] [US2] Commands `CrearUnidad` y `CambiarEstadoOperativoUnidad` (con `[Authorize(Roles = "Supervisor")]`) en `backend/src/Application/Unidades/Commands/`
-- [ ] T031 [US2] Endpoints `POST /unidades` y `PATCH /unidades/{id}/estado` en `backend/src/Web/Controllers/UnidadesController.cs` (depende de T030); emite `UnidadActualizada` por SignalR
-- [ ] T032 [P] [US2] Query `ListarUnidades` en `backend/src/Application/Unidades/Queries/ListarUnidades.cs`
-- [ ] T033 [US2] Endpoint `GET /unidades` en `UnidadesController.cs` (depende de T032)
-- [ ] T034 [P] [US2] Componente Angular "Unidades" (listado + alta + cambio de estado, visible según rol) en `frontend/src/app/views/unidades`
-- [ ] T035 [US2] Mostrar unidades y su estado operativo en el mapa operativo (integración con T026)
+- [x] T030 [P] [US2] Commands `CrearUnidad` y `CambiarEstadoOperativoUnidad` (con `[Authorize(Roles = Roles.Supervisor)]`) en `backend/src/Application/Unidades/Commands/`
+- [x] T031 [US2] Endpoints `POST /api/Unidades` y `PATCH /api/Unidades/{id}/estado` en `backend/src/Web/Endpoints/Unidades.cs` (Minimal API, mismo patrón que T022); emite `UnidadActualizada` por SignalR. **Verificado con `curl`**: 403 como Operador, éxito como Supervisor, estado reflejado en el listado
+- [x] T032 [P] [US2] Query `ListarUnidadesQuery` en `backend/src/Application/Unidades/Queries/`
+- [x] T033 [US2] Endpoint `GET /api/Unidades` en `Unidades.cs` (depende de T032) — verificado
+- [x] T034 [P] [US2] Componente Angular "Unidades" (listado + alta + cambio de estado) en `frontend/src/app/views/unidades/unidades.component.ts` — alta y cambio de estado solo visibles si `AuthService.isSupervisor()` es verdadero (requirió agregar `GET /api/Users/me`, ver nota abajo)
+- [x] T035 [US2] Unidades con coordenadas se muestran en el mapa operativo con un ícono distinto al de las emergencias (integración con T026); se agregaron campos de latitud/longitud opcionales al formulario de alta de unidad
 
-**Checkpoint**: User Stories 1 y 2 funcionan de forma independiente.
+**Nota técnica no prevista**: los access tokens de ASP.NET Core Identity son **opacos**
+(no un JWT auto-contenido), así que el frontend no puede leer el rol desde el token.
+Se agregó `GET /api/Users/me` (usando `IUser` inyectado directamente en el endpoint)
+para que el frontend consulte el rol tras el login y decida qué mostrar.
+
+**Checkpoint**: User Stories 1 y 2 funcionan de forma independiente y verificadas
+end-to-end contra MySQL real.
 
 ---
 
