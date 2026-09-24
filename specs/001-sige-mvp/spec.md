@@ -189,10 +189,15 @@ de esos datos.
   junto con las unidades de respuesta.
 - **FR-004**: El sistema MUST permitir administrar unidades de respuesta de tipo
   ambulancia, bomberos y patrullero, incluyendo su estado operativo (disponible,
-  ocupada, fuera de servicio).
+  ocupada, fuera de servicio). Crear una unidad y cambiar su estado operativo
+  manualmente (por ejemplo, a "fuera de servicio") MUST estar restringido al rol
+  Supervisor; cualquier rol autenticado puede consultarlas (FR-005).
 - **FR-005**: El sistema MUST mostrar la disponibilidad y el estado operativo actual
   de cada unidad en todo momento.
 - **FR-006**: El sistema MUST permitir asignar una o más unidades a una emergencia.
+  Mientras una unidad tenga una asignación activa (emergencia no cerrada), su estado
+  operativo MUST ser "ocupada", por lo que no puede quedar asignada simultáneamente a
+  otra emergencia (ver FR-007).
 - **FR-007**: El sistema MUST revalidar la disponibilidad de una unidad en el momento
   de confirmar su asignación (control optimista) y MUST rechazar la asignación con un
   mensaje explicativo si la unidad ya no está disponible o es incompatible con su
@@ -220,7 +225,17 @@ de esos datos.
   forma independiente; el estado general de la emergencia MUST pasar a "atendida"
   únicamente cuando todas sus unidades asignadas alcanzan "atendida".
 - **FR-017**: El sistema MUST restringir el cierre y la reapertura de una emergencia
-  exclusivamente al rol Supervisor.
+  exclusivamente al rol Supervisor. No hay límite de veces que una emergencia puede
+  reabrirse; cada cierre y cada reapertura MUST generar su propio evento de auditoría
+  (FR-010).
+- **FR-018**: Al cerrar una emergencia, el sistema MUST liberar automáticamente (pasar
+  a "disponible") las unidades que quedaron asignadas a ella, salvo que una unidad ya
+  esté marcada "fuera de servicio" por un motivo independiente. Al reabrir una
+  emergencia, las unidades no se reasignan automáticamente; el Operador debe volver a
+  asignarlas si corresponde.
+- **FR-019**: El sistema MUST aceptar el registro de una emergencia con el nombre del
+  reportante como dato obligatorio; el contacto del reportante (teléfono) es opcional,
+  ya que en una emergencia real no siempre puede obtenerse.
 
 ### Key Entities
 

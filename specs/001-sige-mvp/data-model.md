@@ -12,7 +12,8 @@ Extraído de `spec.md` (Key Entities) y de las decisiones de `research.md`.
 | Latitud / Longitud | double | Obligatorios; bloquear guardado si faltan (Assumptions) |
 | Prioridad | enum (Baja/Media/Alta/Crítica) | Obligatorio |
 | FechaHoraReporte | datetime (UTC) | Se asigna al crear |
-| ReportanteNombre / ReportanteContacto | string | Datos básicos del reportante (FR-001) |
+| ReportanteNombre | string | Obligatorio (FR-019) |
+| ReportanteContacto | string (nullable) | Opcional (FR-019) |
 | Estado | enum | reportada → validada → despachada → en ruta → en el lugar → atendida → cerrada (FR-009) — ver regla de derivación en FR-016 cuando hay múltiples unidades |
 | CreadoPor | FK Usuario | Operador que la registró |
 
@@ -24,7 +25,12 @@ Extraído de `spec.md` (Key Entities) y de las decisiones de `research.md`.
   campo `Estado` de la Emergencia pasa a `atendida` solo cuando **todas** las
   asignaciones activas están en `atendida` (FR-016).
 - `cerrada` y la reapertura (`cerrada` → estado anterior) solo las puede ejecutar un
-  Usuario con rol `Supervisor` (FR-017).
+  Usuario con rol `Supervisor` (FR-017), sin límite de reaperturas; cada una genera su
+  propio `EventoAuditoria`.
+- Al cerrar, todas las `UnidadRespuesta` con una `Asignacion` activa hacia esa
+  Emergencia MUST volver a `EstadoOperativo = Disponible`, salvo que ya estén
+  `FueraDeServicio` (FR-018). Al reabrir, esas unidades NO se reasignan
+  automáticamente.
 - Nunca se elimina físicamente (Principio IV constitution; FR-013).
 
 ## UnidadRespuesta

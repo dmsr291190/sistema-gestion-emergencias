@@ -17,7 +17,7 @@ Base path sugerido: `/api/v1`. Todos los endpoints (salvo login) requieren JWT e
 | GET | `/emergencias` | Lista emergencias, filtrable por estado/prioridad (para mapa y dashboard). | FR-003, FR-011 |
 | GET | `/emergencias/{id}` | Detalle: datos, unidades asignadas, timeline. | US1, US4 |
 | PATCH | `/emergencias/{id}/estado` | Cambia el estado (validada, despachada, etc.) de la emergencia o de una asignación específica. | FR-009, FR-016 |
-| POST | `/emergencias/{id}/cerrar` | **[Supervisor]** Cierra la emergencia. | FR-017 |
+| POST | `/emergencias/{id}/cerrar` | **[Supervisor]** Cierra la emergencia y libera automáticamente sus unidades asignadas (pasan a Disponible, salvo Fuera de Servicio). | FR-017, FR-018 |
 | POST | `/emergencias/{id}/reabrir` | **[Supervisor]** Reabre una emergencia cerrada. | FR-017 |
 | GET | `/emergencias/{id}/timeline` | Devuelve los `EventoAuditoria` asociados, ordenados por fecha. | FR-008, FR-010 |
 
