@@ -35,16 +35,19 @@ en el Command de MediatR (Application), no en el endpoint.
 | PATCH | `/api/Unidades/{id}/estado` | **[Supervisor]** Cambia el estado operativo; emite `UnidadActualizada`. | FR-004 | ✅ Verificado |
 | GET | `/api/Users/me` | Rol del usuario autenticado (`{ id, roles }`) — agregado porque el access token de Identity es opaco y el frontend no puede leerlo. | FR-012 | ✅ Verificado |
 
-## Asignaciones (`/api/Asignaciones`) — pendiente (US3)
+## Asignaciones — implementadas en US3
 
-| Método | Ruta prevista | Descripción | Requisitos |
-|---|---|---|---|
-| POST | `/api/Emergencias/{id}/asignaciones` | Asigna una unidad disponible (requiere `Validada`); revalida disponibilidad en la misma transacción. Genera `EventoAuditoria` "UnidadAsignada". | FR-006, FR-007, FR-009, FR-010 |
+| Método | Ruta real | Descripción | Requisitos | Estado |
+|---|---|---|---|---|
+| POST | `/api/Emergencias/{id}/asignaciones` | Body `{ unidadId }`. Asigna una unidad disponible (requiere `Validada`, no `Cerrada`); revalida disponibilidad con un `UPDATE` condicional atómico (no una transacción explícita — ver `research.md` §4 y `tasks.md` T038). Genera `EventoAuditoria` "UnidadAsignada"; primera asignación pasa la emergencia a "Despachada". | FR-006, FR-007, FR-009, FR-010 | ✅ Verificado |
+| PATCH | `/api/Asignaciones/{id}/estado` | Avanza el estado de una asignación (despachada→…→atendida). | FR-016 | ⏳ Pendiente (US4) |
 
-**Error de negocio esperado** en `POST /emergencias/{id}/asignaciones` cuando la unidad
-ya no está disponible: `409 Conflict` con cuerpo
-`{ "codigo": "UNIDAD_NO_DISPONIBLE", "mensaje": "..." }` — el frontend lo traduce en el
-mensaje al Operador (Edge Case de concurrencia en `spec.md`).
+**Errores de negocio verificados** (`409 Conflict`, cuerpo `{ codigo, mensaje }` —
+implementado con `ConflictException` + `ProblemDetailsExceptionHandler`, T014):
+- `EMERGENCIA_NO_VALIDADA`: la emergencia sigue en "Reportada".
+- `EMERGENCIA_CERRADA`: la emergencia ya está cerrada.
+- `UNIDAD_NO_DISPONIBLE`: la unidad ya fue asignada por otro operador (Edge Case de
+  concurrencia en `spec.md`) — el frontend muestra `mensaje` directamente al Operador.
 
 ## Dashboard (`/api/Dashboard`) — pendiente (US5)
 

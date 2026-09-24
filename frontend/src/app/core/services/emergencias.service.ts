@@ -25,4 +25,8 @@ export class EmergenciasService {
   validar(id: number): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/validar`, {});
   }
+
+  asignarUnidad(emergenciaId: number, unidadId: number): Observable<number> {
+    return this.http.post<number>(`${this.baseUrl}/${emergenciaId}/asignaciones`, { unidadId });
+  }
 }

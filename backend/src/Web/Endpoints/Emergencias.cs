@@ -1,3 +1,4 @@
+using Sige.Application.Asignaciones.Commands.AsignarUnidad;
 using Sige.Application.Emergencias.Commands.CrearEmergencia;
 using Sige.Application.Emergencias.Commands.ValidarEmergencia;
 using Sige.Application.Emergencias.Queries;
@@ -18,6 +19,7 @@ public class Emergencias : IEndpointGroup
         groupBuilder.MapGet(ListarEmergencias);
         groupBuilder.MapGet(ObtenerEmergencia, "{id}");
         groupBuilder.MapPost(ValidarEmergencia, "{id}/validar");
+        groupBuilder.MapPost(AsignarUnidad, "{id}/asignaciones");
     }
 
     public static async Task<Created<int>> CrearEmergencia(
@@ -46,4 +48,15 @@ public class Emergencias : IEndpointGroup
         await hub.Clients.All.SendAsync("EmergenciaActualizada", new { emergenciaId = id, estado = "Validada" });
         return TypedResults.NoContent();
     }
+
+    public static async Task<Created<int>> AsignarUnidad(
+        ISender sender, IHubContext<OperacionesHub> hub, int id, AsignarUnidadRequest body)
+    {
+        var emergenciaId = await sender.Send(new AsignarUnidadCommand { EmergenciaId = id, UnidadId = body.UnidadId });
+        await hub.Clients.All.SendAsync("EmergenciaActualizada", new { emergenciaId, estado = "Despachada" });
+        await hub.Clients.All.SendAsync("UnidadActualizada", new { unidadId = body.UnidadId, estadoOperativo = "Ocupada" });
+        return TypedResults.Created($"/api/Emergencias/{id}", emergenciaId);
+    }
 }
+
+public record AsignarUnidadRequest(int UnidadId);

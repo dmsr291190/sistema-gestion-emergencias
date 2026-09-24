@@ -129,17 +129,24 @@ end-to-end contra MySQL real.
 
 ### Tests para User Story 3
 
-- [ ] T036 [P] [US3] Prueba unitaria de la revalidación optimista de disponibilidad al confirmar una asignación (FR-007) en `backend/tests/Application.UnitTests/Asignaciones/AsignarUnidadCommandTests.cs`
-- [ ] T037 [P] [US3] Prueba de integración simulando dos asignaciones concurrentes sobre la misma unidad, verificando `409 Conflict` con código `UNIDAD_NO_DISPONIBLE` en `backend/tests/Application.FunctionalTests/Asignaciones/ConcurrenciaAsignacionTests.cs` (escenario de `quickstart.md`)
+- [ ] T036 [P] [US3] Prueba unitaria de la revalidación optimista — **no automatizada**: `ExecuteUpdateAsync` no se comporta igual contra el proveedor EF Core InMemory que contra MySQL real, así que se verificó manualmente con `curl` (ver bitácora) en vez de escribir un test que daría una falsa sensación de seguridad
+- [ ] T037 [P] [US3] Prueba de integración de concurrencia — **no automatizada** (misma razón que T036 + requiere `SigeDb_Test`); verificado manualmente que la segunda asignación sobre la misma unidad devuelve `409` con código `UNIDAD_NO_DISPONIBLE`
 
 ### Implementación de User Story 3
 
-- [ ] T038 [US3] Command `AsignarUnidad` con revalidación optimista dentro de la transacción (FR-007) en `backend/src/Application/Asignaciones/Commands/AsignarUnidad/` (depende de T006–T008, T028b — la emergencia debe estar "validada", FR-009)
-- [ ] T039 [US3] Endpoint `POST /emergencias/{id}/asignaciones` en `backend/src/Web/Controllers/AsignacionesController.cs` (depende de T038); marca la unidad como "ocupada", genera `EventoAuditoria` "UnidadAsignada" (FR-010) y emite `EmergenciaActualizada` + `UnidadActualizada`
-- [ ] T040 [P] [US3] Componente Angular "Centro de despacho" (selección de unidades disponibles + confirmación de asignación) en `frontend/src/app/views/despacho`
-- [ ] T041 [US3] Manejo en frontend del error `409 UNIDAD_NO_DISPONIBLE` con mensaje claro al Operador (depende de T040)
+- [x] T038 [US3] Command `AsignarUnidad` en `backend/src/Application/Asignaciones/Commands/AsignarUnidad/` — revalidación optimista implementada con `DbSet.Where(...).ExecuteUpdateAsync(...)` (UPDATE condicional atómico: `WHERE Id = X AND EstadoOperativo = Disponible`), **no** con una transacción explícita envolviendo todo el handler (simplificación aceptada, documentada en el propio código y en la bitácora). También valida que la emergencia esté "Validada" y no "Cerrada" (FR-009)
+- [x] T039 [US3] Endpoint `POST /api/Emergencias/{id}/asignaciones` en `backend/src/Web/Endpoints/Emergencias.cs` (Minimal API, no Controller); marca la unidad "Ocupada", genera `EventoAuditoria` "UnidadAsignada", pasa la emergencia de "Validada" a "Despachada" en la primera asignación, y emite `EmergenciaActualizada` + `UnidadActualizada`. **T014 (middleware de error de negocio) se implementó aquí**: nueva `ConflictException` → 409 con cuerpo `{ codigo, mensaje }`
+- [x] T040 [P] [US3] Componente Angular "Centro de despacho" en `frontend/src/app/views/despacho/despacho.component.ts` — selecciona entre emergencias ya validadas (no "Reportada" ni "Cerrada") y unidades "Disponibles"
+- [x] T041 [US3] El frontend muestra `err.error.mensaje` (del cuerpo `{codigo, mensaje}`) en un `alert-danger` ante cualquier conflicto (`UNIDAD_NO_DISPONIBLE`, `EMERGENCIA_NO_VALIDADA`, `EMERGENCIA_CERRADA`)
 
-**Checkpoint**: recorrido registrar → asignar ya es demostrable de punta a punta (P1 completo).
+**Verificado con `curl` contra MySQL real**: asignar sin validar → 409
+`EMERGENCIA_NO_VALIDADA`; validar → 204; asignar unidad disponible → 201 (emergencia
+pasa a "Despachada"); reintentar asignar la misma unidad (ya "Ocupada") a otra
+emergencia → 409 `UNIDAD_NO_DISPONIBLE`; detalle muestra la asignación y las 3
+entradas del timeline (Creada, Validada, UnidadAsignada).
+
+**Checkpoint**: recorrido registrar → validar → asignar es demostrable de punta a
+punta contra MySQL real (P1 completo).
 
 ---
 

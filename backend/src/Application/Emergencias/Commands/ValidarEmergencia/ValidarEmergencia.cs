@@ -28,7 +28,7 @@ public class ValidarEmergenciaCommandHandler : IRequestHandler<ValidarEmergencia
     {
         var entity = await _context.Emergencias
             .FindAsync([request.EmergenciaId], cancellationToken)
-            ?? throw new KeyNotFoundException($"Emergencia {request.EmergenciaId} no encontrada.");
+            ?? throw new NotFoundException(nameof(Emergencia), request.EmergenciaId.ToString());
 
         if (entity.Estado != EstadoEmergencia.Reportada)
         {

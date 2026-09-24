@@ -40,13 +40,31 @@ public class ProblemDetailsExceptionHandler : IExceptionHandler
                 Title = "Forbidden",
                 Type = "https://tools.ietf.org/html/rfc9110#section-15.5.4"
             }),
+            ConflictException => (StatusCodes.Status409Conflict, new ProblemDetails
+            {
+                Status = StatusCodes.Status409Conflict,
+                Title = "Conflict",
+                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+                Detail = exception.Message
+            }),
             _ => (-1, null)
         };
 
         if (problemDetails is null) return false;
 
         httpContext.Response.StatusCode = statusCode;
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+
+        // contracts/rest-api.md: cuerpo { codigo, mensaje } para conflictos de negocio
+        // (ej. UNIDAD_NO_DISPONIBLE), ademas del ProblemDetails estandar.
+        if (exception is ConflictException conflict)
+        {
+            await httpContext.Response.WriteAsJsonAsync(new { codigo = conflict.Codigo, mensaje = conflict.Message }, cancellationToken);
+        }
+        else
+        {
+            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+        }
+
         return true;
     }
 }

@@ -33,7 +33,7 @@ public class CambiarEstadoOperativoUnidadCommandHandler : IRequestHandler<Cambia
     {
         var entity = await _context.UnidadesRespuesta
             .FindAsync([request.UnidadId], cancellationToken)
-            ?? throw new KeyNotFoundException($"Unidad {request.UnidadId} no encontrada.");
+            ?? throw new NotFoundException(nameof(UnidadRespuesta), request.UnidadId.ToString());
 
         var estadoAnterior = entity.EstadoOperativo;
         entity.EstadoOperativo = request.NuevoEstado;
