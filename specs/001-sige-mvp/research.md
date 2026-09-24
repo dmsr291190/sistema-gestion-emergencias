@@ -3,17 +3,23 @@
 Todas las incógnitas del Technical Context del plan se resuelven aquí antes de pasar
 al diseño (Fase 1).
 
-## 1. ¿PostGIS o coordenadas simples?
+## 1. Motor de base de datos y manejo de ubicación geográfica
 
-- **Decision**: usar columnas `latitud`/`longitud` (double) en PostgreSQL, sin PostGIS.
-- **Rationale**: el MVP no requiere consultas espaciales complejas (radio de búsqueda,
-  intersección de polígonos); "unidad más cercana" puede resolverse en memoria con la
-  fórmula de Haversine sobre un conjunto pequeño de unidades (decenas), suficiente para
-  una demo en aula. Añadir PostGIS incrementa la complejidad de infraestructura sin
-  aportar valor demostrable al alcance definido (Principio VII de la constitución).
-- **Alternatives considered**: PostGIS con `ST_Distance` — se descarta por complejidad
-  innecesaria para el volumen de datos del MVP; se puede migrar después si el proyecto
-  crece más allá del curso.
+- **Decision**: **MySQL**, ya provisionado y en ejecución en un contenedor Docker del
+  entorno del usuario (no se crea un servicio nuevo de base de datos en
+  `docker-compose.yml`; el backend solo se conecta a ese contenedor existente vía
+  variables de entorno). Acceso desde .NET con EF Core + proveedor
+  `Pomelo.EntityFrameworkCore.MySql`. Ubicación como columnas `latitud`/`longitud`
+  (`double`) simples, sin tipos `SPATIAL`/`POINT` de MySQL.
+- **Rationale**: el usuario ya tiene MySQL corriendo en Docker para este proyecto, así
+  que reutilizarlo evita infraestructura duplicada. El MVP no requiere consultas
+  espaciales complejas (radio de búsqueda, intersección de polígonos); "unidad más
+  cercana" puede resolverse en memoria con la fórmula de Haversine sobre un conjunto
+  pequeño de unidades (decenas), suficiente para una demo en aula.
+- **Alternatives considered**: PostgreSQL/PostGIS — descartado tras confirmar que el
+  motor ya disponible es MySQL; tipos `SPATIAL` de MySQL con `ST_Distance_Sphere` — se
+  descarta por complejidad innecesaria para el volumen de datos del MVP; se puede
+  reconsiderar si el proyecto crece más allá del curso.
 
 ## 2. Estrategia de tiempo real
 

@@ -6,8 +6,10 @@ Guía para levantar el proyecto localmente y validar el recorrido mínimo demost
 ## Prerrequisitos
 
 - Docker y Docker Compose instalados.
-- Archivo `.env` creado a partir de `.env.example` (sin secretos reales, solo valores
-  de desarrollo local).
+- El contenedor MySQL del proyecto ya debe estar corriendo en Docker (no lo levanta
+  este `docker-compose.yml`).
+- Archivo `.env` creado a partir de `.env.example`, con la cadena de conexión al MySQL
+  existente (sin secretos reales, solo valores de desarrollo local).
 
 ## Levantar el entorno
 
@@ -15,8 +17,8 @@ Guía para levantar el proyecto localmente y validar el recorrido mínimo demost
 docker compose up --build
 ```
 
-Esto debe levantar: PostgreSQL, backend (.NET Web API) y frontend (Angular), según la
-estructura definida en `plan.md`.
+Esto debe levantar backend (.NET Web API) y frontend (Angular), conectándose al MySQL
+ya existente en Docker, según la estructura definida en `plan.md`.
 
 ## Datos demo esperados
 

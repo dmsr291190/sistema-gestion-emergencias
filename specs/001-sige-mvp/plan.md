@@ -11,20 +11,31 @@ emergencias georreferenciadas, verlas en un mapa junto a las unidades de respues
 (ambulancia, bomberos, patrullero), asignarles una o varias unidades con progreso de
 estado independiente por unidad, actualizar en tiempo real mapa y dashboard, y cerrar
 el incidente conservando trazabilidad completa. Enfoque técnico: monolito simple de
-dos capas (Angular + .NET Web API) sobre PostgreSQL, con SignalR para push en tiempo
-real; se evitan microservicios porque el alcance del MVP no los justifica
-(Constitución, Restricciones Técnicas y de Calidad).
+dos capas (Angular + .NET Web API) sobre MySQL (ya provisionado en Docker), con
+SignalR para push en tiempo real; se evitan microservicios porque el alcance del MVP
+no los justifica
+(Constitución, Restricciones Técnicas y de Calidad). Para acelerar un MVP de curso, el
+backend se escafolda a partir de la plantilla **Clean Architecture de Jason Taylor**
+(`dotnet new ca-sln`) y el frontend adopta **CoreUI para Angular** como kit de UI/admin
+en lugar de construir el layout y los widgets desde cero.
 
 ## Technical Context
 
 **Language/Version**: TypeScript (Angular 18+) en frontend; C# / .NET 8 en backend.
 
-**Primary Dependencies**: Angular, Leaflet + OpenStreetMap (mapa); ASP.NET Core Web
-API, Entity Framework Core, SignalR (tiempo real), autenticación JWT.
+**Primary Dependencies**:
+- Backend: plantilla **Jason Taylor Clean Architecture** para .NET (ASP.NET Core Web
+  API + MediatR para CQRS, FluentValidation, AutoMapper, Entity Framework Core),
+  SignalR (tiempo real), autenticación JWT.
+- Frontend: Angular, **CoreUI para Angular** (`@coreui/angular`) como kit de
+  layout/admin (sidebar, tablas, widgets de dashboard, gráficos), Leaflet +
+  OpenStreetMap (mapa) integrado dentro del layout de CoreUI.
 
-**Storage**: PostgreSQL. Se evalúa PostGIS solo si una consulta geográfica concreta lo
-requiere (p. ej. "unidades más cercanas"); si el MVP puede resolverse con
-lat/lon + cálculo simple de distancia, no se agrega PostGIS.
+**Storage**: MySQL, ya provisionado y en ejecución en Docker en el entorno del usuario
+(no se levanta una instancia nueva vía docker-compose; el backend se conecta a ese
+contenedor existente mediante variables de entorno). Sin extensión espacial: si el MVP
+necesita "unidades más cercanas" se resuelve con lat/lon + cálculo de distancia en
+memoria (Haversine), no con tipos `SPATIAL`/`POINT` de MySQL.
 
 **Testing**: xUnit + integración con base de datos en memoria/contenedor para el
 backend; pruebas unitarias de componentes/servicios Angular; un flujo de pruebas de
@@ -53,9 +64,9 @@ prueba, 2 roles (Operador, Supervisor), sin multi-tenant ni alta disponibilidad.
 
 | Principio (constitution.md) | Cómo se cumple en este plan |
 |---|---|
-| I. Arquitectura Limpia y Modular | Separación explícita `frontend/` (Angular) y `backend/` (.NET) con capas Domain / Application / Infrastructure / Api dentro del backend. |
-| II. Reglas de Negocio en el Backend | Transiciones de estado, reglas de asignación y revalidación de disponibilidad (FR-007, FR-016) viven en la capa Application del backend; el frontend solo consume la API. |
-| III. Validación Estricta de Entradas | Validación server-side con FluentValidation o Data Annotations en los endpoints de creación de emergencia y asignación (FR-015). |
+| I. Arquitectura Limpia y Modular | Separación explícita `frontend/` (Angular + CoreUI) y `backend/` (.NET) con capas Domain / Application / Infrastructure / Web, ya impuestas por la plantilla Jason Taylor. |
+| II. Reglas de Negocio en el Backend | Transiciones de estado, reglas de asignación y revalidación de disponibilidad (FR-007, FR-016) viven en Commands/Queries de MediatR dentro de Application; el frontend (CoreUI) solo consume la API. |
+| III. Validación Estricta de Entradas | Validación server-side con FluentValidation (parte de la plantilla) en cada Command de creación de emergencia y asignación (FR-015). |
 | IV. Trazabilidad y Auditoría | Entidad `EventoAuditoria`/timeline persistida, sin borrado físico de `Emergencia` (soft-state, nunca DELETE). |
 | V. Seguridad por Defecto y Mínimo Privilegio | JWT + roles `Operador`/`Supervisor`; endpoints de cierre/reapertura (FR-017) protegidos con autorización por rol. |
 | VI. Calidad de Código y Manejo de Errores | Pruebas unitarias sobre reglas críticas (asignación, transiciones); manejo de errores centralizado (middleware de excepciones) en la API. |
@@ -81,38 +92,46 @@ specs/001-sige-mvp/
 ### Source Code (repository root)
 
 ```text
-backend/
+backend/                            # Escafoldado con la plantilla Jason Taylor (dotnet new ca-sln)
 ├── src/
-│   ├── Sige.Domain/           # Entidades y reglas de negocio (Emergencia, Unidad, Asignacion)
-│   ├── Sige.Application/      # Casos de uso, validaciones, orquestación de transiciones
-│   ├── Sige.Infrastructure/   # EF Core, repositorios, PostgreSQL, migraciones
-│   └── Sige.Api/              # Controllers REST, SignalR hub, autenticación JWT
+│   ├── Domain/                # Entidades y reglas de negocio (Emergencia, Unidad, Asignacion)
+│   ├── Application/           # CQRS (MediatR): Commands/Queries, FluentValidation, AutoMapper
+│   ├── Infrastructure/        # EF Core (Pomelo.EntityFrameworkCore.MySql), repositorios, migraciones
+│   └── Web/                   # Controllers REST, SignalR hub, autenticación JWT (nombre de
+│                               # proyecto según convención del template: "Web", no "Api")
 └── tests/
-    ├── Sige.UnitTests/        # Reglas críticas: asignación, transiciones, roles
-    └── Sige.IntegrationTests/ # Endpoints principales end-to-end contra BD de prueba
+    ├── Domain.UnitTests/
+    ├── Application.UnitTests/     # Reglas críticas: asignación, transiciones, roles
+    └── Application.FunctionalTests/ # Endpoints principales end-to-end contra BD de prueba
 
-frontend/
+frontend/                           # Angular + CoreUI (@coreui/angular)
 ├── src/
 │   ├── app/
-│   │   ├── features/
+│   │   ├── views/
 │   │   │   ├── auth/               # Login por rol
 │   │   │   ├── emergencias/        # Registro, detalle, timeline
 │   │   │   ├── unidades/           # Administración y disponibilidad
 │   │   │   ├── despacho/           # Asignación de unidades
-│   │   │   ├── mapa/               # Mapa operativo (Leaflet + OSM)
-│   │   │   └── dashboard/          # Indicadores
+│   │   │   ├── mapa/               # Mapa operativo (Leaflet + OSM dentro del layout CoreUI)
+│   │   │   └── dashboard/          # Indicadores con widgets/gráficos de CoreUI
+│   │   ├── layout/                 # DefaultLayoutComponent + sidebar (_nav.ts) de CoreUI
 │   │   ├── core/                   # Servicios API, guards de rol, cliente SignalR
-│   │   └── shared/                 # Componentes UI reutilizables
+│   │   └── shared/                 # Componentes reutilizables propios del proyecto
 └── tests/                          # Pruebas unitarias de componentes/servicios
 
-docker-compose.yml                  # Orquesta frontend + backend + PostgreSQL local
-.env.example                        # Variables de entorno sin secretos reales
+docker-compose.yml                  # Orquesta frontend + backend; se conecta al MySQL
+                                     # ya existente en Docker (no define un nuevo servicio de BD)
+.env.example                        # Variables de entorno sin secretos reales (incluye
+                                     # cadena de conexión al MySQL existente)
 ```
 
 **Structure Decision**: Opción "Web application" (frontend Angular + backend .NET Web
-API separados), tal como pide la guía. Dentro del backend se aplica una separación tipo
-Clean Architecture (`Domain` → `Application` → `Infrastructure`/`Api`) para satisfacer
-el Principio I de la constitución sin introducir microservicios (Principio VII).
+API separados), tal como pide la guía. El backend usa la plantilla Jason Taylor, que ya
+impone Clean Architecture (`Domain` → `Application` → `Infrastructure` → `Web`) con
+CQRS vía MediatR, satisfaciendo el Principio I de la constitución sin introducir
+microservicios (Principio VII). El frontend usa CoreUI para Angular como kit de UI/admin
+(layout, sidebar, tablas y widgets de dashboard ya construidos), reduciendo el trabajo
+de UI propio a los flujos específicos del dominio (mapa, despacho, timeline).
 
 ## Complexity Tracking
 
