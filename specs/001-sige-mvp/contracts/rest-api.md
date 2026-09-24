@@ -51,11 +51,11 @@ implementado con `ConflictException` + `ProblemDetailsExceptionHandler`, T014):
 - `EMERGENCIA_NO_ATENDIDA`: se intentó cerrar una emergencia que no está "Atendida".
 - `EMERGENCIA_NO_CERRADA`: se intentó reabrir una emergencia que no está "Cerrada".
 
-## Dashboard (`/api/Dashboard`) — pendiente (US5)
+## Dashboard — implementado en US5
 
-| Método | Ruta prevista | Descripción | Requisitos |
-|---|---|---|---|
-| GET | `/api/Dashboard/indicadores` | Conteo de emergencias activas por estado/prioridad y unidades disponibles vs. ocupadas. | FR-011 |
+| Método | Ruta real | Descripción | Requisitos | Estado |
+|---|---|---|---|---|
+| GET | `/api/Dashboard/indicadores` | Conteo de emergencias **activas** (excluye "Cerrada") por estado y por prioridad, y unidades por estado operativo (`unidadesDisponibles`, `unidadesOcupadas`, `unidadesFueraDeServicio`). | FR-011 | ✅ Verificado |
 
 ## Eventos SignalR (hub `/hubs/operaciones`)
 

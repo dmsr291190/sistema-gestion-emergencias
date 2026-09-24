@@ -203,15 +203,16 @@ Cerrada, Reabierta).
 
 ### Tests para User Story 5
 
-- [ ] T052 [P] [US5] Prueba de integración de `GET /dashboard/indicadores` contra datos demo conocidos en `backend/tests/Application.FunctionalTests/Dashboard/IndicadoresTests.cs`
+- [x] T052 [P] [US5] Prueba unitaria (no de integración) de `ObtenerIndicadoresDashboardQuery` con datos conocidos en `backend/tests/Application.UnitTests/Dashboard/ObtenerIndicadoresDashboardTests.cs` — 2 casos, usando `Microsoft.EntityFrameworkCore.InMemory` (el `GroupBy` se resuelve en memoria en C#, no traducido a SQL, así que el proveedor InMemory sí lo soporta sin problema, a diferencia de `ExecuteUpdateAsync`)
 
 ### Implementación de User Story 5
 
-- [ ] T053 [US5] Query `ObtenerIndicadoresDashboard` (conteo por estado/prioridad de emergencias, disponibles vs. ocupadas de unidades) en `backend/src/Application/Dashboard/Queries/`
-- [ ] T054 [US5] Endpoint `GET /dashboard/indicadores` en `backend/src/Web/Controllers/DashboardController.cs` (depende de T053)
-- [ ] T055 [US5] Componente Angular "Dashboard" con widgets/gráficos de CoreUI en `frontend/src/app/views/dashboard`, suscrito a `EmergenciaActualizada`/`UnidadActualizada` para refresco sin recarga manual (FR-014, SC-006)
+- [x] T053 [US5] Query `ObtenerIndicadoresDashboardQuery` en `backend/src/Application/Dashboard/Queries/` — excluye emergencias "Cerrada" del conteo por estado/prioridad (FR-011); cuenta unidades por `EstadoOperativo`
+- [x] T054 [US5] Endpoint `GET /api/Dashboard/indicadores` en `backend/src/Web/Endpoints/Dashboard.cs` (Minimal API) — verificado con `curl`, los conteos coinciden con los datos reales dejados por US1–US4
+- [x] T055 [US5] Componente Angular "Dashboard" (`c-widget-stat-a` de CoreUI para unidades + listas de conteo por estado/prioridad) en `frontend/src/app/views/dashboard/dashboard.component.ts` — **sin suscripción a SignalR todavía** (T017 sigue pendiente); se recarga al entrar a la vista, no en vivo
 
-**Checkpoint**: las 5 historias de usuario funcionan de forma independiente y en conjunto.
+**Checkpoint**: las 5 historias de usuario funcionan de forma independiente y en
+conjunto, verificadas end-to-end contra MySQL real.
 
 ---
 
