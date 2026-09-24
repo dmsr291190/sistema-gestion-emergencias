@@ -1,5 +1,7 @@
 using Sige.Application.Asignaciones.Commands.AsignarUnidad;
+using Sige.Application.Emergencias.Commands.CerrarEmergencia;
 using Sige.Application.Emergencias.Commands.CrearEmergencia;
+using Sige.Application.Emergencias.Commands.ReabrirEmergencia;
 using Sige.Application.Emergencias.Commands.ValidarEmergencia;
 using Sige.Application.Emergencias.Queries;
 using Sige.Web.Hubs;
@@ -20,6 +22,8 @@ public class Emergencias : IEndpointGroup
         groupBuilder.MapGet(ObtenerEmergencia, "{id}");
         groupBuilder.MapPost(ValidarEmergencia, "{id}/validar");
         groupBuilder.MapPost(AsignarUnidad, "{id}/asignaciones");
+        groupBuilder.MapPost(CerrarEmergencia, "{id}/cerrar");
+        groupBuilder.MapPost(ReabrirEmergencia, "{id}/reabrir");
     }
 
     public static async Task<Created<int>> CrearEmergencia(
@@ -56,6 +60,20 @@ public class Emergencias : IEndpointGroup
         await hub.Clients.All.SendAsync("EmergenciaActualizada", new { emergenciaId, estado = "Despachada" });
         await hub.Clients.All.SendAsync("UnidadActualizada", new { unidadId = body.UnidadId, estadoOperativo = "Ocupada" });
         return TypedResults.Created($"/api/Emergencias/{id}", emergenciaId);
+    }
+
+    public static async Task<NoContent> CerrarEmergencia(ISender sender, IHubContext<OperacionesHub> hub, int id)
+    {
+        await sender.Send(new CerrarEmergenciaCommand { EmergenciaId = id });
+        await hub.Clients.All.SendAsync("EmergenciaActualizada", new { emergenciaId = id, estado = "Cerrada" });
+        return TypedResults.NoContent();
+    }
+
+    public static async Task<NoContent> ReabrirEmergencia(ISender sender, IHubContext<OperacionesHub> hub, int id)
+    {
+        await sender.Send(new ReabrirEmergenciaCommand { EmergenciaId = id });
+        await hub.Clients.All.SendAsync("EmergenciaActualizada", new { emergenciaId = id, estado = "Atendida" });
+        return TypedResults.NoContent();
     }
 }
 

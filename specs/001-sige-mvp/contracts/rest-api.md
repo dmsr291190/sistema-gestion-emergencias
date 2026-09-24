@@ -22,9 +22,8 @@ en el Command de MediatR (Application), no en el endpoint.
 | POST | `/api/Emergencias/{id}/validar` | Transición `Reportada` → `Validada`. Genera `EventoAuditoria` "EmergenciaValidada". | FR-009, FR-010 | ✅ Verificado |
 | GET | `/api/Emergencias` | Lista todas las emergencias (sin filtro todavía). | FR-003, FR-011 | ✅ Verificado |
 | GET | `/api/Emergencias/{id}` | Detalle con `asignaciones` y `timeline` completos. | US1, US4 | ✅ Verificado |
-| POST | `/api/Emergencias/{id}/cerrar` | **[Supervisor]** Cierra y libera unidades. | FR-017, FR-018, FR-010 | ⏳ Pendiente (US4) |
-| POST | `/api/Emergencias/{id}/reabrir` | **[Supervisor]** Reabre una emergencia cerrada. | FR-017, FR-010 | ⏳ Pendiente (US4) |
-| PATCH | `/api/Asignaciones/{id}/estado` | Avanza el estado de una asignación (despachada→…→atendida). | FR-016 | ⏳ Pendiente (US4) |
+| POST | `/api/Emergencias/{id}/cerrar` | **[Supervisor]** Requiere estado "Atendida"; cierra y libera las unidades asignadas. | FR-017, FR-018, FR-010 | ✅ Verificado |
+| POST | `/api/Emergencias/{id}/reabrir` | **[Supervisor]** Requiere estado "Cerrada"; vuelve a "Atendida". | FR-017, FR-010 | ✅ Verificado |
 
 ## Unidades (`/api/Unidades`) — implementadas en US2
 
@@ -40,7 +39,7 @@ en el Command de MediatR (Application), no en el endpoint.
 | Método | Ruta real | Descripción | Requisitos | Estado |
 |---|---|---|---|---|
 | POST | `/api/Emergencias/{id}/asignaciones` | Body `{ unidadId }`. Asigna una unidad disponible (requiere `Validada`, no `Cerrada`); revalida disponibilidad con un `UPDATE` condicional atómico (no una transacción explícita — ver `research.md` §4 y `tasks.md` T038). Genera `EventoAuditoria` "UnidadAsignada"; primera asignación pasa la emergencia a "Despachada". | FR-006, FR-007, FR-009, FR-010 | ✅ Verificado |
-| PATCH | `/api/Asignaciones/{id}/estado` | Avanza el estado de una asignación (despachada→…→atendida). | FR-016 | ⏳ Pendiente (US4) |
+| PATCH | `/api/Asignaciones/{id}/estado` | Avanza el estado de una asignación (solo hacia adelante); recalcula el estado de la Emergencia (FR-016). | FR-016 | ✅ Verificado |
 
 **Errores de negocio verificados** (`409 Conflict`, cuerpo `{ codigo, mensaje }` —
 implementado con `ConflictException` + `ProblemDetailsExceptionHandler`, T014):
@@ -48,6 +47,9 @@ implementado con `ConflictException` + `ProblemDetailsExceptionHandler`, T014):
 - `EMERGENCIA_CERRADA`: la emergencia ya está cerrada.
 - `UNIDAD_NO_DISPONIBLE`: la unidad ya fue asignada por otro operador (Edge Case de
   concurrencia en `spec.md`) — el frontend muestra `mensaje` directamente al Operador.
+- `TRANSICION_INVALIDA`: se intentó retroceder o repetir el estado de una asignación.
+- `EMERGENCIA_NO_ATENDIDA`: se intentó cerrar una emergencia que no está "Atendida".
+- `EMERGENCIA_NO_CERRADA`: se intentó reabrir una emergencia que no está "Cerrada".
 
 ## Dashboard (`/api/Dashboard`) — pendiente (US5)
 

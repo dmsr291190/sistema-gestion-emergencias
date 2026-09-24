@@ -158,21 +158,40 @@ punta contra MySQL real (P1 completo).
 
 ### Tests para User Story 4
 
-- [ ] T042 [P] [US4] Prueba unitaria: la emergencia pasa a "atendida" solo cuando todas sus asignaciones activas llegan a "atendida" (FR-016) en `backend/tests/Application.UnitTests/Emergencias/DerivarEstadoEmergenciaTests.cs`
-- [ ] T043 [P] [US4] Prueba unitaria: cerrar libera automáticamente las unidades asignadas salvo "fuera de servicio" (FR-018) en `backend/tests/Application.UnitTests/Emergencias/CerrarEmergenciaTests.cs`
-- [ ] T044 [P] [US4] Prueba unitaria: solo Supervisor puede cerrar/reabrir (FR-017) en `backend/tests/Application.UnitTests/Emergencias/AutorizacionCierreTests.cs`
+- [x] T042 [P] [US4] Prueba unitaria: la emergencia pasa a "atendida" solo cuando todas sus asignaciones activas llegan a "atendida" (FR-016) en `backend/tests/Application.UnitTests/Asignaciones/CambiarEstadoAsignacionTests.cs` (4 casos, usando `Microsoft.EntityFrameworkCore.InMemory` — se agregó al proyecto). **Esta prueba encontró un bug real** antes de tocar `curl`: ver nota abajo
+- [ ] T043 [P] [US4] Prueba unitaria de liberación de unidades al cerrar — **no automatizada**: `CerrarEmergenciaCommand` usa `ExecuteUpdateAsync`, que el proveedor EF Core InMemory no soporta (lanza `NotSupportedException`); verificado manualmente con `curl` (unidad vuelve a "Disponible" tras cerrar)
+- [x] T044 [P] [US4] Prueba unitaria: solo Supervisor puede cerrar/reabrir (FR-017) en `backend/tests/Application.UnitTests/Emergencias/AutorizacionCierreTests.cs` (3 casos)
 
 ### Implementación de User Story 4
 
-- [ ] T045 [US4] Command `CambiarEstadoAsignacion` (avanza despachada→en ruta→en el lugar→atendida y recalcula el estado de la Emergencia) en `backend/src/Application/Asignaciones/Commands/CambiarEstadoAsignacion/`
-- [ ] T046 [US4] Endpoint `PATCH /asignaciones/{id}/estado` en `AsignacionesController.cs` (depende de T045); genera `EventoAuditoria` (FR-010)
-- [ ] T047 [US4] Commands `CerrarEmergencia` y `ReabrirEmergencia` (`[Authorize(Roles = "Supervisor")]`, libera unidades en cierre — FR-018) en `backend/src/Application/Emergencias/Commands/`
-- [ ] T048 [US4] Endpoints `POST /emergencias/{id}/cerrar` y `POST /emergencias/{id}/reabrir` en `EmergenciasController.cs` (depende de T047); generan `EventoAuditoria` "EmergenciaCerrada"/"EmergenciaReabierta" respectivamente (FR-010)
-- [ ] T049 [US4] Endpoint `GET /emergencias/{id}/timeline` (lee `EventoAuditoria` ordenado por fecha) en `EmergenciasController.cs`
-- [ ] T050 [US4] Componente Angular "Línea de tiempo" dentro del detalle de emergencia, mostrando cada evento con usuario y fecha/hora (depende de T027, T049)
-- [ ] T051 [US4] Botones de avance de estado, cierre y reapertura en el detalle de emergencia, visibles/habilitados según rol (depende de T050)
+- [x] T045 [US4] Command `CambiarEstadoAsignacion` en `backend/src/Application/Asignaciones/Commands/CambiarEstadoAsignacion/` — recalcula el estado de la Emergencia (una sola asignación → sigue su avance; varias → "Atendida" solo si todas llegan a "Atendida"); rechaza retroceder o repetir el estado actual (`ConflictException TRANSICION_INVALIDA`)
+- [x] T046 [US4] Endpoint `PATCH /api/Asignaciones/{id}/estado` en `backend/src/Web/Endpoints/Asignaciones.cs` (Minimal API); genera `EventoAuditoria` "CambioEstado" (FR-010) — verificado con `curl`
+- [x] T047 [US4] Commands `CerrarEmergencia` y `ReabrirEmergencia` (`[Authorize(Roles = Roles.Supervisor)]`) en `backend/src/Application/Emergencias/Commands/`; `CerrarEmergencia` libera las unidades asignadas (salvo "FueraDeServicio") con el mismo patrón de `UPDATE` atómico de T038
+- [x] T048 [US4] Endpoints `POST /api/Emergencias/{id}/cerrar` y `POST /api/Emergencias/{id}/reabrir` en `Emergencias.cs` (depende de T047); generan `EventoAuditoria` "EmergenciaCerrada"/"EmergenciaReabierta" — verificados con `curl` (403 Operador, 204 Supervisor)
+- [x] T049 [US4] No se creó un endpoint `/timeline` separado: `GET /api/Emergencias/{id}` ya devuelve el timeline completo (decisión tomada desde US1, ver `contracts/rest-api.md`)
+- [x] T050 [US4] "Línea de tiempo" ya existía en `emergencia-detalle.component.ts` desde US1; sin cambios adicionales
+- [x] T051 [US4] Botones de avance de asignación (uno por unidad, "Avanzar a X"), y "Cerrar emergencia"/"Reabrir" (solo si `AuthService.isSupervisor()`) agregados al detalle de emergencia
 
-**Checkpoint**: ciclo completo reportar → asignar → avanzar estados → cerrar → timeline es demostrable (recorrido mínimo, guía §16).
+**Bug real encontrado por la prueba unitaria T042** (antes de llegar a `curl`): al
+recalcular el estado de la emergencia dentro del mismo `Handle`, una proyección
+escalar (`Select(a => a.EstadoAsignacion)`) no reflejaba el cambio que el propio
+método ya había hecho en memoria sobre esa misma asignación (todavía sin
+`SaveChanges`) — EF Core no fusiona cambios no guardados en una proyección escalar
+nueva. Se corrigió consultando las entidades completas (no una proyección), donde EF
+Core sí aplica resolución de identidad y devuelve la instancia trackeada con su valor
+en memoria actualizado.
+
+**Verificado con `curl` contra MySQL real** (secuencia completa, en orden, sobre la
+emergencia y asignación creadas en US3): avanzar EnRuta → EnElLugar → Atendida (204
+cada una, la emergencia pasa sola a "Atendida" al ser una sola unidad) → cerrar como
+Operador (403) → cerrar como Supervisor (204) → la unidad vuelve a "Disponible" → 
+reabrir como Supervisor (204, la emergencia vuelve a "Atendida") → el detalle final
+muestra **8 eventos** en el timeline (Creada, Validada, UnidadAsignada, 3×CambioEstado,
+Cerrada, Reabierta).
+
+**Checkpoint**: ciclo completo reportar → validar → asignar → avanzar estados → cerrar
+→ reabrir es demostrable de punta a punta contra MySQL real (recorrido mínimo, guía
+§16, completo).
 
 ---
 

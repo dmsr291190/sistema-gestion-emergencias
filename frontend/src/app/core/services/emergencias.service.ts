@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../api-config';
-import { CrearEmergenciaRequest, Emergencia, EmergenciaDetalle } from '../models/emergencia.model';
+import { CrearEmergenciaRequest, Emergencia, EmergenciaDetalle, EstadoAsignacion } from '../models/emergencia.model';
 
 @Injectable({ providedIn: 'root' })
 export class EmergenciasService {
@@ -28,5 +28,17 @@ export class EmergenciasService {
 
   asignarUnidad(emergenciaId: number, unidadId: number): Observable<number> {
     return this.http.post<number>(`${this.baseUrl}/${emergenciaId}/asignaciones`, { unidadId });
+  }
+
+  cambiarEstadoAsignacion(asignacionId: number, nuevoEstado: EstadoAsignacion): Observable<void> {
+    return this.http.patch<void>(`${API_BASE_URL}/api/Asignaciones/${asignacionId}/estado`, { nuevoEstado });
+  }
+
+  cerrar(id: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/cerrar`, {});
+  }
+
+  reabrir(id: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/reabrir`, {});
   }
 }

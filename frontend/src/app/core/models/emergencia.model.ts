@@ -37,12 +37,19 @@ export interface EventoAuditoria {
   fechaHora: string;
 }
 
+export enum EstadoAsignacion {
+  Despachada = 0,
+  EnRuta = 1,
+  EnElLugar = 2,
+  Atendida = 3
+}
+
 export interface AsignacionResumen {
   id: number;
   unidadId: number;
   unidadIdentificador: string;
   unidadTipo: number;
-  estadoAsignacion: number;
+  estadoAsignacion: EstadoAsignacion;
   fechaHoraAsignacion: string;
 }
 
