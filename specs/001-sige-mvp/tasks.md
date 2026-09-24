@@ -183,14 +183,36 @@ del recorrido vertical). Bloquea todas las historias de usuario.
 
 ---
 
-## Phase 8: Polish & Cross-Cutting Concerns
+## Phase 8: User Story 6 - Experiencia de uso clara, consistente y responsiva (Priority: P3)
+
+**Goal**: cada pantalla es legible en anchos de aula, cada acción crítica da retroalimentación
+clara, los estados/prioridades se ven igual en todas las vistas, y los formularios son
+navegables por teclado (FR-020 a FR-024, SC-007). Agregada como historia de usuario a
+petición de Diego durante Implement — ver bitácora.
+
+**Independent Test**: abrir cada pantalla a 1024px de ancho y forzar un error de validación
+en cada formulario, sin depender de un flujo de negocio completo.
+
+### Implementación de User Story 6
+
+- [ ] T061 [P] [US6] Revisar el layout responsivo (grid de CoreUI) de las 6 pantallas a 1024px de ancho; ajustar donde se rompa (FR-020)
+- [ ] T062 [P] [US6] Mostrar el mensaje de error de FluentValidation junto al campo correspondiente en los formularios de login, nueva emergencia y alta de unidad, en español y específico (FR-021)
+- [ ] T063 [P] [US6] Agregar estado "cargando"/deshabilitado en los botones de crear, validar, asignar, cambiar estado, cerrar y reabrir, para evitar envíos duplicados (FR-022)
+- [ ] T064 [P] [US6] Definir un mapeo único de etiqueta/color por `EstadoEmergencia` y `Prioridad` (constante o servicio compartido en `frontend/src/app/core`) y reutilizarlo en listado, mapa, detalle y dashboard, reemplazando los objetos `estadoLabel`/`prioridadLabel` duplicados por componente (FR-023)
+- [ ] T065 [US6] Verificar el orden de tabulación del formulario "Nueva emergencia" y corregirlo si no sigue el orden visual (FR-024)
+- [ ] T066 [US6] Prueba manual: recorrer las 6 pantallas a 1024px y forzar un error en cada formulario; registrar el resultado en la Bitácora (verificación de SC-007)
+
+**Checkpoint**: el MVP es demostrable y comprensible en un proyector de aula sin explicación técnica adicional (SC-005, SC-007).
+
+---
+
+## Phase 9: Polish & Cross-Cutting Concerns
 
 **Purpose**: pruebas y datos demo adicionales + endurecimiento y correcciones finales
 (puntos 11–12 del recorrido vertical, guía §12)
 
 - [ ] T056 Ejecutar manualmente el escenario de `quickstart.md` de punta a punta y registrar el resultado en la Bitácora
 - [ ] T057 [P] Revisar que ningún secreto quede versionado (`.env`, cadena de conexión MySQL) — Principio "Restricciones Técnicas y de Calidad" de `constitution.md`
-- [ ] T058 [P] Revisar accesibilidad/responsividad básica del layout CoreUI para la demo en aula (Principio VII)
 - [ ] T059 Resolver los hallazgos diferidos del checklist `mvp-quality.md` que sigan abiertos tras `/speckit-analyze` (CHK001, CHK012/CHK028, CHK019, CHK021, CHK023)
 - [ ] T060 Ejecutar toda la suite de pruebas (`dotnet test`, pruebas Angular) y corregir fallos antes de `/speckit-converge`
 
@@ -210,7 +232,10 @@ del recorrido vertical). Bloquea todas las historias de usuario.
 - **US4 (Fase 6)**: depende de US3 (necesita asignaciones existentes para avanzar estado).
 - **US5 (Fase 7)**: depende de Foundational; en la práctica requiere datos de US1–US4
   para ser demostrable con sentido.
-- **Polish (Fase 8)**: depende de que las historias que se vayan a demostrar estén completas.
+- **US6 (Fase 8)**: transversal — cada tarea toca pantallas ya construidas en US1–US5
+  (formularios, listados, mapa, dashboard), así que conviene hacerla **después** de que
+  esas pantallas existan, no en paralelo desde el inicio.
+- **Polish (Fase 9)**: depende de que las historias que se vayan a demostrar estén completas.
 
 ### Oportunidades de paralelización
 
@@ -240,4 +265,5 @@ del recorrido vertical). Bloquea todas las historias de usuario.
 4. + US3 → despacho funcional (MVP funcional según guía §16).
 5. + US4 → ciclo completo con cierre y timeline.
 6. + US5 → dashboard.
-7. Polish → endurecimiento antes de `/speckit-converge`.
+7. + US6 → pulido de UX sobre todas las pantallas ya construidas.
+8. Polish → endurecimiento antes de `/speckit-converge`.

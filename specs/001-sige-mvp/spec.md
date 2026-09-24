@@ -158,6 +158,47 @@ de esos datos.
 
 ---
 
+### User Story 6 - Experiencia de uso clara, consistente y responsiva (Priority: P3)
+
+Un Operador o Supervisor usa SIGE en distintos tamaños de pantalla (laptop en el
+puesto de trabajo, proyector en una demostración en aula) y siempre entiende qué
+está pasando: cada acción crítica (registrar, validar, asignar, cambiar estado,
+cerrar) da una confirmación o un mensaje de error claro en español, los estados y
+prioridades se identifican de un vistazo con el mismo lenguaje visual en todas las
+pantallas, y la navegación es consistente entre vistas.
+
+**Why this priority**: no bloquea el ciclo de negocio (las historias 1 a 5 funcionan
+sin esto), pero es lo que hace que el MVP sea *demostrable* y comprensible por un
+observador externo sin explicación técnica (objetivo del MVP, SC-005) — por eso
+tiene la misma prioridad que el Dashboard (P3) y se trabaja junto con o después de
+las historias operativas.
+
+**Independent Test**: puede probarse abriendo cada pantalla del MVP (login,
+dashboard, mapa, emergencias, unidades, despacho) en un ancho de escritorio y en un
+ancho reducido (ej. proyector en 1024px), y forzando al menos un error de validación
+en cada formulario, sin necesidad de un flujo de negocio completo.
+
+**Acceptance Scenarios**:
+
+1. **Given** cualquier pantalla del MVP, **When** se reduce el ancho de la ventana al
+   típico de una demostración en aula (≥1024px), **Then** el contenido permanece
+   legible y utilizable, sin scroll horizontal ni elementos superpuestos.
+2. **Given** un formulario con campos obligatorios (nueva emergencia, alta de unidad,
+   login), **When** el usuario lo envía incompleto o con un dato inválido, **Then**
+   el sistema muestra, junto al campo correspondiente, un mensaje específico en
+   español que indica qué corregir — no un error genérico ni un código técnico.
+3. **Given** una acción crítica en curso (crear, validar, asignar, cerrar, reabrir),
+   **When** el usuario la ejecuta, **Then** el botón muestra un estado de "cargando"
+   y se deshabilita hasta recibir respuesta, para evitar envíos duplicados.
+4. **Given** los mismos valores de estado y prioridad, **When** aparecen en el
+   listado de emergencias, el mapa, el detalle y el dashboard, **Then** se
+   representan con la misma etiqueta y el mismo color en todas las pantallas.
+5. **Given** un usuario que navega solo con teclado, **When** recorre el formulario
+   de "Nueva emergencia" con Tab, **Then** el orden de foco sigue el orden visual de
+   los campos y el botón de enviar es alcanzable sin usar el mouse.
+
+---
+
 ### Edge Cases
 
 - Si dos Operadores intentan asignar la misma unidad a emergencias distintas casi al
@@ -240,6 +281,19 @@ de esos datos.
 - **FR-019**: El sistema MUST aceptar el registro de una emergencia con el nombre del
   reportante como dato obligatorio; el contacto del reportante (teléfono) es opcional,
   ya que en una emergencia real no siempre puede obtenerse.
+- **FR-020**: El sistema MUST permanecer legible y utilizable, sin scroll horizontal
+  ni elementos superpuestos, en anchos de pantalla desde 1024px (User Story 6).
+- **FR-021**: El sistema MUST mostrar, junto a cada campo obligatorio inválido de un
+  formulario, un mensaje de error específico en español (no genérico ni un código
+  técnico) que indique qué corregir.
+- **FR-022**: El sistema MUST deshabilitar el control de envío y mostrar un estado de
+  "cargando" mientras una acción crítica (crear, validar, asignar, cambiar estado,
+  cerrar, reabrir) está en curso, para evitar envíos duplicados.
+- **FR-023**: El sistema MUST usar la misma etiqueta y el mismo color para cada valor
+  de estado y de prioridad en todas las pantallas donde aparece (listado, mapa,
+  detalle, dashboard).
+- **FR-024**: Los formularios del MVP MUST poder completarse y enviarse navegando
+  únicamente con teclado, siguiendo el orden visual de los campos.
 
 ### Key Entities
 
@@ -276,6 +330,10 @@ de esos datos.
 - **SC-006**: El dashboard refleja un cambio de estado de una emergencia o de
   disponibilidad de una unidad sin que el usuario necesite recargar manualmente la
   página.
+- **SC-007**: El 100% de los formularios del MVP (login, nueva emergencia, alta de
+  unidad) muestra un mensaje de error específico junto al campo correspondiente ante
+  un dato inválido, y ninguno permite un envío duplicado mientras la acción está en
+  curso.
 
 ## Assumptions
 
