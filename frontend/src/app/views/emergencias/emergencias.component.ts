@@ -29,8 +29,9 @@ import { ESTADO_EMERGENCIA_COLOR, ESTADO_EMERGENCIA_LABEL, PRIORIDAD_LABEL } fro
           <c-card-header>Nueva emergencia</c-card-header>
           <c-card-body>
             <form (ngSubmit)="crear()">
+              <h6 class="text-uppercase text-body-secondary small">Datos generales</h6>
               <app-form-field label="Tipo de emergencia" [error]="errores()['tipoemergenciaid']">
-                <select class="form-select" name="tipoEmergenciaId" [(ngModel)]="form.tipoEmergenciaId" required>
+                <select class="form-select" name="tipoEmergenciaId" [(ngModel)]="form.tipoEmergenciaId" (ngModelChange)="onTipoCambiado($event)" required>
                   <option [ngValue]="0" disabled>-- Selecciona un tipo --</option>
                   @for (t of tipos(); track t.id) {
                     <option [ngValue]="t.id">{{ t.nombre }}</option>
@@ -40,7 +41,20 @@ import { ESTADO_EMERGENCIA_COLOR, ESTADO_EMERGENCIA_LABEL, PRIORIDAD_LABEL } fro
               <app-form-field label="Descripcion" [error]="errores()['descripcion']">
                 <textarea class="form-control" name="descripcion" [(ngModel)]="form.descripcion" required></textarea>
               </app-form-field>
+              <!-- FR-125 (campo dependiente): al elegir el tipo, la prioridad se
+                   autocompleta con TipoEmergencia.PrioridadPorDefecto (editable
+                   despues) -- sustituye al "subtipo" del documento de origen, que
+                   no existe como entidad separada en este modelo de datos. -->
+              <app-form-field label="Prioridad" [error]="errores()['prioridad']">
+                <select class="form-select" name="prioridad" [(ngModel)]="form.prioridad">
+                  <option [ngValue]="0">Baja</option>
+                  <option [ngValue]="1">Media</option>
+                  <option [ngValue]="2">Alta</option>
+                  <option [ngValue]="3">Critica</option>
+                </select>
+              </app-form-field>
 
+              <h6 class="text-uppercase text-body-secondary small mt-4">Ubicación</h6>
               <div class="form-check mb-2">
                 <input class="form-check-input" type="checkbox" id="sinDireccionFormal"
                        name="sinDireccionFormal" [(ngModel)]="form.ubicacion.sinDireccionFormal" />
@@ -92,16 +106,7 @@ import { ESTADO_EMERGENCIA_COLOR, ESTADO_EMERGENCIA_LABEL, PRIORIDAD_LABEL } fro
                 </div>
               </div>
 
-              <app-form-field label="Prioridad" [error]="errores()['prioridad']">
-                <select class="form-select" name="prioridad" [(ngModel)]="form.prioridad">
-                  <option [ngValue]="0">Baja</option>
-                  <option [ngValue]="1">Media</option>
-                  <option [ngValue]="2">Alta</option>
-                  <option [ngValue]="3">Critica</option>
-                </select>
-              </app-form-field>
-
-              <h6 class="mt-3">Afectados</h6>
+              <h6 class="text-uppercase text-body-secondary small mt-4">Afectados</h6>
               <div class="row">
                 <div class="col-4"><app-form-field label="Heridos"><input class="form-control" type="number" min="0" name="heridos" [(ngModel)]="form.heridos" /></app-form-field></div>
                 <div class="col-4"><app-form-field label="Desaparecidos"><input class="form-control" type="number" min="0" name="desaparecidos" [(ngModel)]="form.desaparecidos" /></app-form-field></div>
@@ -112,6 +117,7 @@ import { ESTADO_EMERGENCIA_COLOR, ESTADO_EMERGENCIA_LABEL, PRIORIDAD_LABEL } fro
                 <div class="col-6"><app-form-field label="Evacuados"><input class="form-control" type="number" min="0" name="evacuados" [(ngModel)]="form.evacuados" /></app-form-field></div>
               </div>
 
+              <h6 class="text-uppercase text-body-secondary small mt-4">Observaciones</h6>
               <app-form-field label="Nombre del reportante" [error]="errores()['reportantenombre']">
                 <input class="form-control" name="reportanteNombre" [(ngModel)]="form.reportanteNombre" required />
               </app-form-field>
@@ -196,6 +202,16 @@ export class EmergenciasComponent implements OnInit {
 
   cargar(): void {
     this.emergenciasService.listar().subscribe((data) => this.emergencias.set(data));
+  }
+
+  // FR-125 (campo dependiente): al cambiar el tipo, se autocompleta la
+  // prioridad con el valor por defecto del catálogo (queda editable).
+  onTipoCambiado(tipoId: number): void {
+    const tipo = this.tipos().find((t) => t.id === tipoId);
+    if (tipo) {
+      this.form.prioridad = tipo.prioridadPorDefecto;
+      this.form.ubicacion.ambito = tipo.ambito;
+    }
   }
 
   crear(): void {

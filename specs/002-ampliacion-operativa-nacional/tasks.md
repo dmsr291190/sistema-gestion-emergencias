@@ -196,9 +196,9 @@ estándar de validación/componente reutilizable del MVP.
 **Independent Test**: abrir el formulario ampliado de "Nueva emergencia" y verificar
 sus secciones y validaciones sin completar un flujo de negocio completo.
 
-- [ ] T049 [US6] Ampliar `CrearEmergenciaCommandValidator` con `Afectados`/`Heridos`/`Desaparecidos`/`Fallecidos`/`Evacuados` — FR-125
-- [ ] T050 [P] [US6] Frontend: reorganizar el formulario de emergencia en secciones (datos generales, ubicación, afectados, evidencias, observaciones), reutilizando `app-form-field` (FR-126) en `frontend/src/app/views/emergencias/emergencias.component.ts`
-- [ ] T051 [P] [US6] Frontend: actualización reactiva de las opciones de subtipo según el tipo elegido (campo dependiente) — FR-125
+- [x] T049 [US6] Ampliar `CrearEmergenciaCommandValidator` con `Afectados`/`Heridos`/`Desaparecidos`/`Fallecidos`/`Evacuados` — FR-125 — ya completado durante Foundational (T008/T034 adelantados por necesidad de compilación)
+- [x] T050 [P] [US6] Frontend: reorganizar el formulario de emergencia en secciones (datos generales, ubicación, afectados, observaciones — sin sección "evidencias": no existe una entidad Evidencia en `data-model.md`, fuera de alcance sin subir archivos), reutilizando `app-form-field` (FR-126) en `frontend/src/app/views/emergencias/emergencias.component.ts`
+- [x] T051 [P] [US6] Frontend: campo dependiente al elegir el tipo — **sustituye "subtipo" por Prioridad y Ámbito**, ya que `data-model.md` no define una entidad Subtipo separada (simplificación documentada en la Etapa de Plan); al cambiar `tipoEmergenciaId` se autocompletan `Prioridad` (desde `TipoEmergencia.PrioridadPorDefecto`) y `Ambito` (desde `TipoEmergencia.Ambito`), ambos editables después — FR-125
 
 **Checkpoint**: US6 completamente funcional y probada de forma independiente.
 
