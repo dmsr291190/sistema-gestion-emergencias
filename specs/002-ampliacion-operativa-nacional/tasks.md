@@ -46,7 +46,7 @@ MVP. Bloquea todas las historias de usuario de esta ampliación.
 - [ ] T004 [P] Crear entidad `TipoEmergencia` en `backend/src/Domain/Entities/TipoEmergencia.cs` (`Nombre` string requerido único máx. 100 caracteres, `Ambito` enum Terrestre/Marítimo/Aéreo/Mixto, `Icono` string, `Color` string hex, `PrioridadPorDefecto` enum del MVP, `Activo` bool default true) — FR-101
 - [ ] T005 [P] Crear entidad `Personal` en `backend/src/Domain/Entities/Personal.cs` (`Nombres`/`Apellidos`/`Documento` requeridos, `InstitucionId` FK, `Especialidad`, `Funcion`, `Certificaciones` nullable, `Disponible` bool default true, `UnidadRespuestaId` FK) — FR-110
 - [ ] T006 [P] Crear entidad `Recurso` en `backend/src/Domain/Entities/Recurso.cs` (`Codigo`/`Nombre` requeridos, `Categoria` enum Equipos/Herramientas/Víveres/Líquidos/Estructuras/MaterialMédico/EquipoRescate, `UnidadMedida`, `Cantidad`, `CantidadDisponible`, `CantidadMinima`, `UnidadRespuestaId` FK) — FR-111, FR-112
-- [ ] T007 [P] Crear value object `Ubicacion` (owned type EF Core) en `backend/src/Domain/ValueObjects/Ubicacion.cs` (`Departamento`/`Provincia`/`Distrito`/`CentroPoblado`/`Direccion`/`Referencia` nullable, `Latitud`/`Longitud` requeridas rango -90..90/-180..180, `Ambito` enum) — FR-104
+- [ ] T007 [P] Crear value object `Ubicacion` (owned type EF Core) en `backend/src/Domain/ValueObjects/Ubicacion.cs` (`Departamento`/`Provincia`/`Distrito`/`CentroPoblado`/`Direccion`/`Referencia` nullable, `Latitud`/`Longitud` requeridas rango -90..90/-180..180, `Ambito` enum **Terrestre/Marítimo/Aéreo/Mixto** (4 valores, igual que `TipoEmergencia.Ambito` — corregido tras Analyze I1), `+SinDireccionFormal` bool default false — corregido tras Analyze I2) — FR-104. Validador: Departamento/Provincia/Distrito requeridos **salvo que `SinDireccionFormal == true`** (no se infiere de `Ambito`)
 - [ ] T008 Extender entidad `Emergencia` en `backend/src/Domain/Entities/Emergencia.cs`: `+TipoEmergenciaId` FK (nullable durante migración), `+Ubicacion` (owned type de T007), `+Afectados`/`Heridos`/`Desaparecidos`/`Fallecidos`/`Evacuados` (int, default 0); conservar `Tipo` (texto libre) como columna legada de solo lectura (Principio IV, no se borra) — FR-105, FR-125
 - [ ] T009 Extender entidad `UnidadRespuesta` en `backend/src/Domain/Entities/UnidadRespuesta.cs`: `+Ubicacion` (owned type de T007), `+InstitucionId` FK, `+UsuarioId` FK nullable a `AspNetUsers`, `+ICollection<Personal>`, `+ICollection<Recurso>`
 - [ ] T010 Agregar los 5 roles nuevos (`Administrador`, `CoordinadorLogistico`, `JefeDeUnidad`, `UnidadDeRespuesta`, `Visualizador`) como constantes en `backend/src/Domain/Constants/Roles.cs`, junto a `Operador`/`Supervisor` ya existentes — FR-117
@@ -56,10 +56,12 @@ MVP. Bloquea todas las historias de usuario de esta ampliación.
 - [ ] T014 Sembrar los 5 roles nuevos de forma idempotente (`RoleManager.RoleExistsAsync` antes de crear) en `backend/src/Infrastructure/Data/ApplicationDbContextInitialiser.cs` — FR-117, FR-123
 - [ ] T015 Implementar la migración de datos de FR-103 en `ApplicationDbContextInitialiser`: para cada `Emergencia` con `TipoEmergenciaId == null`, buscar `TipoEmergencia` por nombre (case-insensitive) o crearlo **activo** por defecto, y vincular — algoritmo exacto en `data-model.md` §"Migración de datos"
 - [ ] T016 Condicionar la ejecución del seed de roles/usuarios/datos demo (T014, y los de US2) a `env.IsDevelopment() || env.EnvironmentName is "Demo" or "Testing"`, nunca en Production — FR-124
+- [ ] T016a [P] Sembrar el catálogo inicial de `Institucion` (bomberos, policía, salud, marina, etc.) de forma idempotente en `ApplicationDbContextInitialiser` — **agregado tras Analyze (hallazgo C2)**: `Personal`, `UnidadRespuesta` y `Usuario` referencian `InstitucionId` y necesitan filas existentes antes de poder crearse
+- [ ] T016b Query `ListarInstitucionesQuery` + endpoint `GET /api/Instituciones` (autenticado) en `backend/src/Application/Instituciones/Queries/` y `backend/src/Web/Endpoints/Instituciones.cs` — **agregado tras Analyze (hallazgo C2)**: sin esto, ningún selector de institución en el frontend (Usuario, Personal, Unidad) tiene de dónde leer las opciones
 
 **Checkpoint**: esquema de base de datos migrado, roles nuevos sembrados de forma
-idempotente, emergencias del MVP vinculadas al catálogo de tipos. A partir de aquí
-cada historia de usuario es independiente.
+idempotente, emergencias del MVP vinculadas al catálogo de tipos, catálogo de
+instituciones disponible. A partir de aquí cada historia de usuario es independiente.
 
 ---
 
@@ -86,8 +88,12 @@ emergencia ni unidad todavía.
 - [ ] T023 [P] [US1] Servicio Angular `UsuariosService` en `frontend/src/app/core/services/usuarios.service.ts`
 - [ ] T024 [P] [US1] Vista Angular de administración de usuarios (listar, crear, editar, bloquear/desbloquear, forzar cambio de password) en `frontend/src/app/views/usuarios/usuarios.component.ts`, reutilizando `app-form-field`
 - [ ] T025 [US1] Restringir el enlace "Usuarios" del layout/sidebar al rol `Administrador` en `frontend/src/app/layout/default-layout/`
+- [ ] T025a [P] [US1] Prueba unitaria: un usuario con rol `UnidadDeRespuesta` no puede cambiar el estado operativo de una unidad distinta a la suya (`UnidadRespuesta.UsuarioId != IUser.Id`) en `backend/tests/Application.UnitTests/Unidades/AutorizacionUnidadPropiaTests.cs` — **agregado tras Analyze (hallazgo C1)** — FR-120
+- [ ] T025b [US1] Implementar la restricción en `CambiarEstadoOperativoUnidadCommand` (`backend/src/Application/Unidades/Commands/CambiarEstadoOperativoUnidad/`): si el único rol del caller es `UnidadDeRespuesta`, exigir `UnidadRespuesta.UsuarioId == IUser.Id`; Operador/Supervisor no quedan sujetos a esta restricción — **agregado tras Analyze (hallazgo C1)** — FR-120
+- [ ] T025c [P] [US1] Frontend: vista mínima "mi unidad" (`frontend/src/app/views/mi-unidad/mi-unidad.component.ts`) restringida por guard de rol `UnidadDeRespuesta`, que solo permite ver/actualizar el estado operativo y la posición de la propia unidad — **agregado tras Analyze (hallazgo C1)** — FR-120
 
-**Checkpoint**: US1 completamente funcional y probada de forma independiente.
+**Checkpoint**: US1 completamente funcional y probada de forma independiente,
+incluida la restricción de acceso propio del rol `UnidadDeRespuesta` (FR-120).
 
 ---
 
@@ -124,7 +130,7 @@ registra una emergencia de ese tipo solo con coordenadas.
 
 ### Tests para User Story 3
 
-- [ ] T030 [P] [US3] Prueba unitaria del validador de `Ubicacion`: latitud/longitud siempre requeridas; departamento/provincia/distrito requeridos solo si `Ambito == Terrestre` en `backend/tests/Application.UnitTests/Emergencias/UbicacionValidatorTests.cs` — FR-104
+- [ ] T030 [P] [US3] Prueba unitaria del validador de `Ubicacion`: latitud/longitud siempre requeridas; departamento/provincia/distrito requeridos **salvo que `SinDireccionFormal == true`** (corregido tras Analyze I2 — no se infiere de `Ambito`) en `backend/tests/Application.UnitTests/Emergencias/UbicacionValidatorTests.cs` — FR-104
 
 ### Implementación de User Story 3
 
@@ -133,7 +139,7 @@ registra una emergencia de ese tipo solo con coordenadas.
 - [ ] T033 [US3] Endpoint group `backend/src/Web/Endpoints/TiposEmergencia.cs`
 - [ ] T034 [US3] Actualizar `CrearEmergenciaCommand`/validador para aceptar `tipoEmergenciaId` y `Ubicacion` completa, rechazando tipos desactivados — FR-102, FR-104, FR-105
 - [ ] T035 [US3] Actualizar `EmergenciaDto`/`ListarEmergenciasQuery`/`ObtenerEmergenciaPorIdQuery` para incluir el tipo del catálogo y la ubicación completa (coordenada exacta, solo autenticado — FR-115a)
-- [ ] T036 [P] [US3] Frontend: selector de tipo/subtipo dependiente + campos de ubicación (departamento/provincia/distrito/centro poblado/dirección/referencia, condicionales según ámbito) en `frontend/src/app/views/emergencias/emergencias.component.ts`
+- [ ] T036 [P] [US3] Frontend: selector de tipo/subtipo dependiente + campos de ubicación (departamento/provincia/distrito/centro poblado/dirección/referencia, ocultos/opcionales cuando se marca el checkbox "sin dirección formal" — corregido tras Analyze I2, no depende del ámbito) en `frontend/src/app/views/emergencias/emergencias.component.ts`
 - [ ] T037 [P] [US3] Frontend: administración simple del catálogo de tipos (crear/editar/activar/desactivar) en `frontend/src/app/views/tipos-emergencia/tipos-emergencia.component.ts`
 
 **Checkpoint**: US3 completamente funcional. **Con US1+US2+US3 completas, el

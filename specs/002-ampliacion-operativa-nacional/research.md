@@ -36,6 +36,15 @@ el backend sigue permitiendo que Operador/Supervisor actualicen cualquier unidad
 (la unidad se autentica ella misma desde un dispositivo propio, sin quitarle esa
 capacidad a Operador/Supervisor).
 
+**Corrección tras Analyze (hallazgo C1)**: el `AuthorizationBehaviour` por rol no
+alcanza para cumplir FR-120 por sí solo — un usuario `UnidadDeRespuesta` autenticado
+podría, sin una regla adicional, intentar cambiar el estado de *cualquier* unidad,
+no solo la suya. Se agrega una verificación explícita dentro de
+`CambiarEstadoOperativoUnidadCommand`: si el único rol del caller es
+`UnidadDeRespuesta`, se exige `UnidadRespuesta.UsuarioId == IUser.Id`; Operador y
+Supervisor no quedan sujetos a esa restricción (siguen pudiendo cambiar cualquier
+unidad, como en el MVP).
+
 **Alternatives considered**: cuenta compartida por tipo de unidad (una sola
 cuenta "unidad" genérica) — rechazada porque no permite atribuir en la auditoría
 qué unidad concreta actualizó su propio estado (Principio IV).

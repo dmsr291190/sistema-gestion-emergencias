@@ -36,11 +36,16 @@ Core) reutilizado en `Emergencia` y `UnidadRespuesta`, igual que ya se hace con
 | Referencia | string, nullable | |
 | Latitud | decimal | requerido |
 | Longitud | decimal | requerido |
-| Ambito | enum: Terrestre/Marítimo/Aéreo | FR-105 |
+| Ambito | enum: Terrestre/Marítimo/Aéreo/Mixto | FR-105 — **corregido tras Analyze (I1)**: debe tener los mismos 4 valores que `TipoEmergencia.Ambito`, no solo 3 |
+| SinDireccionFormal | bool, default false | **agregado tras Analyze (I2)** — ver regla debajo |
 
-Regla (FR-104): si `Ambito` no tiene dirección formal (marítimo/remoto),
-Departamento/Provincia/Distrito pueden quedar `null`; Latitud/Longitud siempre
-son requeridas.
+Regla (FR-104, corregida tras Analyze — I2): Departamento/Provincia/Distrito son
+requeridos **salvo que `SinDireccionFormal == true`** — un flag explícito que el
+usuario marca al registrar (por ejemplo, en zonas marítimas o terrestres remotas sin
+dirección formal), en vez de inferirlo del `Ambito`. Esto evita que una emergencia
+terrestre en una zona remota (ámbito Terrestre, pero sin dirección formal) quede
+forzada a dar un distrito que no aplica. Latitud/Longitud siempre son requeridas,
+independientemente de `SinDireccionFormal`.
 
 ### Institución
 
@@ -142,8 +147,9 @@ ampliación, fuera de alcance salvo que Diego lo pida).
 
 - `TipoEmergencia.Nombre`: requerido, único, máx. 100 caracteres.
 - `Ubicacion`: Latitud/Longitud siempre requeridas y dentro de rango válido
-  (-90..90 / -180..180); Departamento/Provincia/Distrito requeridos solo si
-  `Ambito == Terrestre` (FR-104).
+  (-90..90 / -180..180); Departamento/Provincia/Distrito requeridos salvo que
+  `SinDireccionFormal == true` (FR-104) — **no** se infiere de `Ambito` (corregido
+  tras Analyze, hallazgo I2).
 - `Recurso.CantidadDisponible <= Recurso.Cantidad`.
 - `Personal.Documento`: requerido, formato validado igual que en el registro de
   usuarios del MVP.

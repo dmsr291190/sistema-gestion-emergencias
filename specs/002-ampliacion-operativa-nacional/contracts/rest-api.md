@@ -6,6 +6,15 @@ vigentes sin cambios de ruta (FR-129). Convención igual: prefijo `/api/{Clase}`
 aplicado en el Command/Query de MediatR (Application), **incluidas las queries**
 (corrección aplicada en Converge del MVP, no repetir el error en esta ampliación).
 
+## Catálogo de instituciones (`/api/Instituciones`) — prerrequisito de US1, US5
+
+**Agregado tras Analyze (hallazgo C2)**: `Personal`, `UnidadRespuesta` y `Usuario`
+referencian `InstitucionId`, pero no existía un endpoint para listarlas.
+
+| Método | Ruta | Descripción | Requisitos |
+|---|---|---|---|
+| GET | `/api/Instituciones` | Lista el catálogo de instituciones (autenticado); usado para poblar los selectores de Usuario, Personal y Unidad. | Key Entity "Institución" |
+
 ## Catálogo de tipos de emergencia (`/api/TiposEmergencia`) — US3
 
 | Método | Ruta | Descripción | Requisitos |
@@ -18,7 +27,7 @@ aplicado en el Command/Query de MediatR (Application), **incluidas las queries**
 
 | Método | Ruta | Cambio | Requisitos |
 |---|---|---|---|
-| POST | `/api/Emergencias` | Body ahora incluye `tipoEmergenciaId`, `ubicacion` (departamento/provincia/distrito/centroPoblado/dirección/referencia opcionales, lat/lon requeridas, ámbito), `afectados/heridos/desaparecidos/fallecidos/evacuados`. | FR-104, FR-105, FR-125 |
+| POST | `/api/Emergencias` | Body ahora incluye `tipoEmergenciaId`, `ubicacion` (`sinDireccionFormal: bool`; si es `false`, departamento/provincia/distrito son requeridos, si es `true` solo lat/lon; ámbito con 4 valores incl. Mixto — corregido tras Analyze I1/I2), `afectados/heridos/desaparecidos/fallecidos/evacuados`. | FR-104, FR-105, FR-125 |
 | GET | `/api/Emergencias`, `/api/Emergencias/{id}` | Respuesta incluye el tipo del catálogo (no solo texto) y la ubicación completa. Solo para usuarios autenticados — siguen viendo coordenada exacta (FR-115a). | FR-101, FR-115a |
 
 ## Personal (`/api/Unidades/{unidadId}/personal`) — US5
