@@ -10,6 +10,7 @@ import {
   NavLinkDirective
 } from '@coreui/angular';
 import { AuthService } from '../../core/services/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 // Layout base del MVP (guia SDD, seccion 17: pantallas objetivo).
 // Se usa una barra de navegacion superior (c-header) en lugar de un c-sidebar
@@ -51,6 +52,9 @@ import { AuthService } from '../../core/services/auth.service';
             }
           </c-nav>
         </c-header-nav>
+        <button class="btn btn-sm btn-outline-secondary me-2" (click)="theme.toggle()" title="Cambiar tema">
+          {{ theme.isDark() ? 'Tema claro' : 'Tema oscuro' }}
+        </button>
         <button class="btn btn-sm btn-outline-secondary" (click)="logout()">Salir</button>
       </c-container>
     </c-header>
@@ -62,6 +66,7 @@ import { AuthService } from '../../core/services/auth.service';
 export class DefaultLayoutComponent {
   constructor(
     readonly auth: AuthService,
+    readonly theme: ThemeService,
     private readonly router: Router
   ) {}
 

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CardBodyComponent, CardComponent, CardHeaderComponent } from '@coreui/angular';
 import { AuthService } from '../../../core/services/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { FormFieldComponent } from '../../../shared/form-field/form-field.component';
 
 // FR-012: acceso autenticado por rol (Operador/Supervisor). Conectado a
@@ -16,7 +17,12 @@ import { FormFieldComponent } from '../../../shared/form-field/form-field.compon
   template: `
     <div class="d-flex justify-content-center align-items-center min-vh-100 bg-body-tertiary">
       <c-card style="width: 24rem;">
-        <c-card-header>Iniciar sesion — SIGE</c-card-header>
+        <c-card-header class="d-flex justify-content-between align-items-center">
+          <span>Iniciar sesion — SIGE</span>
+          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="theme.toggle()">
+            {{ theme.isDark() ? 'Tema claro' : 'Tema oscuro' }}
+          </button>
+        </c-card-header>
         <c-card-body>
           <form (ngSubmit)="onSubmit()">
             <app-form-field label="Correo" [error]="errores()['email']">
@@ -52,6 +58,7 @@ export class LoginComponent {
 
   constructor(
     private readonly auth: AuthService,
+    readonly theme: ThemeService,
     private readonly router: Router
   ) {}
 

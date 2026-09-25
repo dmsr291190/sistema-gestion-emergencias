@@ -19,7 +19,10 @@ export const ESTADO_EMERGENCIA_COLOR: Record<number, string> = {
   3: 'primary',
   4: 'primary',
   5: 'success',
-  6: 'dark'
+  // FR-128 (revisión de contraste, US9): "dark" perdía contraste sobre fondo
+  // oscuro (texto casi negro sobre fondo casi negro); "body-emphasis" es la
+  // utilidad de Bootstrap 5.3+/CoreUI 5 que se adapta al tema activo.
+  6: 'body-emphasis'
 };
 
 export const PRIORIDAD_LABEL: Record<number, string> = {
@@ -46,7 +49,7 @@ export const ESTADO_EMERGENCIA_COLOR_POR_NOMBRE: Record<string, string> = {
   EnRuta: 'primary',
   EnElLugar: 'primary',
   Atendida: 'success',
-  Cerrada: 'dark'
+  Cerrada: 'body-emphasis'
 };
 
 export const PRIORIDAD_COLOR_POR_NOMBRE: Record<string, string> = {

@@ -48,7 +48,9 @@ export interface EstadoCapas {
 
           <h6 class="mt-3">Ámbito</h6>
           <div class="d-flex gap-2 flex-wrap small">
-            <span class="badge bg-dark">Terrestre</span>
+            <!-- FR-128 (revisión de contraste, US9): text-bg-dark (no solo bg-dark)
+                 empareja fondo y texto de forma segura en ambos temas. -->
+            <span class="badge text-bg-dark">Terrestre</span>
             <span class="badge" style="background:#3399ff;">Marítimo</span>
             <span class="badge bg-primary">Aéreo</span>
             <span class="badge bg-secondary">Mixto</span>

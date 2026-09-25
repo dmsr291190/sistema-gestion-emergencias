@@ -249,8 +249,8 @@ coinciden con los datos reales.
 **Independent Test**: recorrer las pantallas principales con el tema activo y
 verificar consistencia y contraste.
 
-- [ ] T060 [US9] Activar el tema oscuro nativo de CoreUI (`data-coreui-theme="dark"`) con un toggle en `frontend/src/app/layout/default-layout/` — FR-128
-- [ ] T061 [P] [US9] Revisar el contraste de los colores de prioridad/estado (`frontend/src/app/core/models/labels.ts`) sobre tema oscuro y ajustar si es necesario — FR-128
+- [x] T060 [US9] Activar el tema oscuro nativo de CoreUI (`data-coreui-theme="dark"`) con un toggle en `frontend/src/app/layout/default-layout/` — FR-128 — nuevo `ThemeService` (persistido en `localStorage`, aplicado desde `app.ts` para que también cubra login y vista pública, no solo el layout autenticado); toggle agregado en las 3 pantallas (layout, login, vista pública)
+- [x] T061 [P] [US9] Revisar el contraste de los colores de prioridad/estado (`frontend/src/app/core/models/labels.ts`) sobre tema oscuro y ajustar si es necesario — FR-128 — se detectó y corrigió un riesgo real de contraste: el estado "Cerrada" usaba `text-dark`/`bg-dark` (texto casi negro sobre fondo oscuro), cambiado a `text-body-emphasis` (labels.ts) y `text-bg-dark` (leyenda del mapa), ambas utilidades de Bootstrap 5.3+/CoreUI 5 que se adaptan al tema activo; el resto de badges (secondary/info/warning/danger/success/primary) no presentan el mismo riesgo porque no invierten significado entre temas. **Pendiente**: verificación visual real en navegador (sin herramienta de captura en esta sesión, igual que T067 del MVP) — recomendado que Diego confirme visualmente antes de la demo
 
 **Checkpoint**: US9 completamente funcional y probada de forma independiente.
 

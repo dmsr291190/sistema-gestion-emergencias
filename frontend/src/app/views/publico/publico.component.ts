@@ -3,6 +3,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, signal } fr
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { PublicoService } from '../../core/services/publico.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { crearIconoMarcador } from '../../core/utils/mapa-icons';
 import { EmergenciaPublica, EmergenciaPublicaDetalle } from '../../core/models/emergencia-publica.model';
 import { PRIORIDAD_LABEL, ESTADO_EMERGENCIA_LABEL, ESTADO_EMERGENCIA_COLOR } from '../../core/models/labels';
@@ -18,11 +19,16 @@ import { PRIORIDAD_LABEL, ESTADO_EMERGENCIA_LABEL, ESTADO_EMERGENCIA_COLOR } fro
   imports: [FormsModule, NgClass, DatePipe],
   template: `
     <div class="sige-publico">
-      <header class="sige-publico-header">
-        <h1>SIGE — Monitoreo Nacional de Emergencias</h1>
-        <p class="text-body-secondary">
-          Vista pública, sin necesidad de iniciar sesión. Última actualización: {{ ahora | date: 'medium' }}.
-        </p>
+      <header class="sige-publico-header d-flex justify-content-between align-items-start">
+        <div>
+          <h1>SIGE — Monitoreo Nacional de Emergencias</h1>
+          <p class="text-body-secondary">
+            Vista pública, sin necesidad de iniciar sesión. Última actualización: {{ ahora | date: 'medium' }}.
+          </p>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="theme.toggle()">
+          {{ theme.isDark() ? 'Tema claro' : 'Tema oscuro' }}
+        </button>
       </header>
 
       <div class="row g-3 px-3">
@@ -112,7 +118,10 @@ export class PublicoComponent implements AfterViewInit, OnDestroy {
   filtroTipo: string | null = null;
   filtroPrioridad: number | null = null;
 
-  constructor(private readonly publicoService: PublicoService) {}
+  constructor(
+    private readonly publicoService: PublicoService,
+    readonly theme: ThemeService
+  ) {}
 
   ngAfterViewInit(): void {
     L.Icon.Default.mergeOptions({
