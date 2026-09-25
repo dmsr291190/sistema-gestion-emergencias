@@ -1,0 +1,33 @@
+USUARIOS DE PRUEBA - SIGE (Sistema Integral de Gestion de Emergencias)
+========================================================================
+
+Contrasena de TODAS las cuentas (incluidas las nuevas de la ampliacion): DemoSige#2026
+
+IMPORTANTE: en la pantalla de login, el campo "Correo" en realidad debe llevar
+el USUARIO (columna "Usuario" de la lista de abajo), no la direccion de correo.
+Ejemplo: escribir "admin.sige", no "admin.sige@sige.local".
+
+------------------------------------------------------------------------
+Usuario                 | Contrasena       | Rol                    | Notas
+------------------------------------------------------------------------
+operador@sige.local     | Operador123!     | Operador               | Cuenta original del MVP
+supervisor@sige.local   | Supervisor123!   | Supervisor             | Cuenta original del MVP
+admin.sige              | DemoSige#2026    | Administrador          | Administra usuarios y roles
+supervisor.sige         | DemoSige#2026    | Supervisor             | Cuenta nacional (ampliacion)
+operador.lima           | DemoSige#2026    | Operador               | Region Lima
+operador.norte          | DemoSige#2026    | Operador               | Region Norte
+logistica.sige          | DemoSige#2026    | CoordinadorLogistico   | Gestiona personal y recursos
+jefe.unidad01           | DemoSige#2026    | JefeDeUnidad           | Gestiona personal y recursos de su unidad
+unidad.maritima01       | DemoSige#2026    | UnidadDeRespuesta      | Cuenta propia, vinculada a una embarcacion demo
+unidad.terrestre01      | DemoSige#2026    | UnidadDeRespuesta      | Cuenta propia, vinculada a una ambulancia demo
+visor.sige              | DemoSige#2026    | Visualizador           | Solo lectura: mapa + dashboard
+prueba.restringida      | DemoSige#2026    | Visualizador           | Cuenta adicional de prueba
+
+------------------------------------------------------------------------
+
+Vista publica (sin necesidad de iniciar sesion):
+  http://localhost:4400/publico
+  (tambien hay un enlace "Ver mapa publico de emergencias" en la pantalla de login)
+
+Frontend: http://localhost:4400
+Backend:  http://localhost:4401
