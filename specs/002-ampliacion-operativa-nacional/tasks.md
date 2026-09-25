@@ -296,3 +296,19 @@ roles ampliado funciona antes de construir el resto.
 alcance P1 completo es demostrable) → US4 → US5 → US6 (P2) → US7 → US8 → US9 (P3) →
 Polish. Cada historia es un incremento independiente y verificable con su propio
 "Independent Test" de `spec.md`.
+
+---
+
+## Phase 13: Convergence
+
+`/speckit-converge` evaluó el código real contra `spec.md`/`plan.md`/`tasks.md` (no
+contra las casillas ya marcadas) y encontró 2 hallazgos, ambos corregidos de
+inmediato (no diferidos) por tratarse de un CRITICAL de seguridad y un HIGH de
+completitud de un requisito explícito:
+
+- [x] T069 **CRITICAL** — Restringir `ListarPersonalPorUnidadQuery`/`ListarRecursosPorUnidadQuery` para que el rol Visualizador no pueda leerlas, per FR-120a (contradicts) — verificado con `curl`: antes del fix, `visor.sige` obtenía `200 OK` con datos reales de personal (incluido `documento`, un DNI) y recursos de cualquier unidad; corregido con un `[Authorize(Roles=...)]` explícito que excluye a Visualizador; agregado `AutorizacionVisualizadorPersonalRecursosTests.cs` (2 casos) para evitar que se repita
+- [x] T070 **HIGH** — Completar la leyenda del mapa (`leyenda.component.ts`) con referencia de Estado de la emergencia y Tipo de unidad, per FR-107 (partial) — la leyenda solo mostraba Prioridad y Ámbito (2 de los 4 conceptos que FR-107 exige explícitamente); agregadas ambas secciones reutilizando `ESTADO_EMERGENCIA_LABEL`/`ESTADO_EMERGENCIA_COLOR`/`TIPO_UNIDAD_LABEL` ya existentes
+
+**Resultado**: `tasks_appended` → ambos hallazgos corregidos en la misma sesión de
+Converge (no quedan pendientes para un pase posterior de `/speckit-implement`).
+`dotnet build`/`ng build` limpios, 50/50 tests backend, 1/1 test frontend.

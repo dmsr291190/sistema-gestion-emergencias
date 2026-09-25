@@ -1,5 +1,6 @@
 using Sige.Application.Common.Interfaces;
 using Sige.Application.Common.Security;
+using Sige.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace Sige.Application.PersonalUnidades.Queries;
@@ -19,7 +20,10 @@ public class PersonalDto
 }
 
 // FR-110: personal visible al seleccionar la unidad en despacho o mapa.
-[Authorize]
+// FR-120a (hallazgo CRITICAL de Converge): el Visualizador MUST NOT tener
+// acceso a personal -- se listan explicitamente los roles permitidos en vez de
+// [Authorize] generico, que dejaba pasar a cualquier rol autenticado.
+[Authorize(Roles = $"{Roles.Operador},{Roles.Supervisor},{Roles.Administrador},{Roles.CoordinadorLogistico},{Roles.JefeDeUnidad},{Roles.UnidadDeRespuesta}")]
 public record ListarPersonalPorUnidadQuery : IRequest<List<PersonalDto>>
 {
     public required int UnidadRespuestaId { get; init; }
