@@ -2,14 +2,46 @@ using Sige.Domain.Enums;
 
 namespace Sige.Application.Emergencias.Queries;
 
+// FR-104: DTO de ubicacion completa para usuarios AUTENTICADOS (coordenada
+// exacta, FR-115a) -- no confundir con el DTO de la vista publica (Publico/),
+// que redondea la ubicacion (FR-115).
+public class UbicacionDto
+{
+    public string? Departamento { get; init; }
+    public string? Provincia { get; init; }
+    public string? Distrito { get; init; }
+    public string? CentroPoblado { get; init; }
+    public string? Direccion { get; init; }
+    public string? Referencia { get; init; }
+    public double Latitud { get; init; }
+    public double Longitud { get; init; }
+    public Ambito Ambito { get; init; }
+    public bool SinDireccionFormal { get; init; }
+}
+
+// FR-101: datos del tipo de emergencia del catalogo, embebidos en el DTO de
+// emergencia para que el frontend no necesite una segunda llamada.
+public class TipoEmergenciaResumenDto
+{
+    public int Id { get; init; }
+    public required string Nombre { get; init; }
+    public Ambito Ambito { get; init; }
+    public string? Icono { get; init; }
+    public string? Color { get; init; }
+}
+
 // FR-003, FR-011: forma usada para el mapa operativo, el listado y el dashboard.
 public class EmergenciaDto
 {
     public int Id { get; init; }
-    public required string Tipo { get; init; }
+    public TipoEmergenciaResumenDto? TipoEmergencia { get; init; }
     public required string Descripcion { get; init; }
-    public double Latitud { get; init; }
-    public double Longitud { get; init; }
+    public required UbicacionDto Ubicacion { get; init; }
+    public int Afectados { get; init; }
+    public int Heridos { get; init; }
+    public int Desaparecidos { get; init; }
+    public int Fallecidos { get; init; }
+    public int Evacuados { get; init; }
     public Prioridad Prioridad { get; init; }
     public EstadoEmergencia Estado { get; init; }
     public DateTimeOffset FechaHoraReporte { get; init; }

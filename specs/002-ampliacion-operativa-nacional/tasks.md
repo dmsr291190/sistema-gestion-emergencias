@@ -28,8 +28,8 @@ orden de prioridad P1→P2→P3 ya justificado en cada "Why this priority".
 
 **Purpose**: dependencias nuevas que no pertenecen a ninguna historia específica.
 
-- [ ] T001 [P] Agregar dependencia `@coreui/icons` en `frontend/package.json` y crear el registro de íconos en `frontend/src/app/icons/icon-subset.ts` (research.md §4) para los ejemplos de la sección 6 del documento de origen (fuego, cruz médica, vehículo, ola, montaña, alerta, avión/helicóptero, persona/rescate)
-- [ ] T002 [P] Agregar `SIGE_DEMO_PASSWORD` a `backend/.env.example` (sin valor real) y a `backend/src/Web/appsettings.Development.json` (gitignored) con el default documentado `DemoSige#2026`
+- [x] T001 [P] Agregar dependencia `@coreui/icons` en `frontend/package.json` y crear el registro de íconos en `frontend/src/app/icons/icon-subset.ts` (research.md §4) para los ejemplos de la sección 6 del documento de origen (fuego, cruz médica, vehículo, ola, montaña, alerta, avión/helicóptero, persona/rescate) — registrado en `app.ts` vía `IconSetService`
+- [x] T002 [P] Agregar `SIGE_DEMO_PASSWORD` a `.env.example` (raíz del repo, sin valor real de producción — es una contraseña demo, no un secreto) con el default documentado `DemoSige#2026`; el código lo lee con `Environment.GetEnvironmentVariable("SIGE_DEMO_PASSWORD") ?? "DemoSige#2026"` (T027)
 
 **Checkpoint**: dependencias nuevas instaladas; sin cambios de dominio todavía.
 
@@ -42,22 +42,22 @@ MVP. Bloquea todas las historias de usuario de esta ampliación.
 
 **⚠️ CRITICAL**: ninguna historia de esta ampliación puede completarse sin esta fase.
 
-- [ ] T003 [P] Crear entidad `Institucion` en `backend/src/Domain/Entities/Institucion.cs` (`Nombre` string requerido único, `Activo` bool default true) — catálogo único compartido (data-model.md, CHK038)
-- [ ] T004 [P] Crear entidad `TipoEmergencia` en `backend/src/Domain/Entities/TipoEmergencia.cs` (`Nombre` string requerido único máx. 100 caracteres, `Ambito` enum Terrestre/Marítimo/Aéreo/Mixto, `Icono` string, `Color` string hex, `PrioridadPorDefecto` enum del MVP, `Activo` bool default true) — FR-101
-- [ ] T005 [P] Crear entidad `Personal` en `backend/src/Domain/Entities/Personal.cs` (`Nombres`/`Apellidos`/`Documento` requeridos, `InstitucionId` FK, `Especialidad`, `Funcion`, `Certificaciones` nullable, `Disponible` bool default true, `UnidadRespuestaId` FK) — FR-110
-- [ ] T006 [P] Crear entidad `Recurso` en `backend/src/Domain/Entities/Recurso.cs` (`Codigo`/`Nombre` requeridos, `Categoria` enum Equipos/Herramientas/Víveres/Líquidos/Estructuras/MaterialMédico/EquipoRescate, `UnidadMedida`, `Cantidad`, `CantidadDisponible`, `CantidadMinima`, `UnidadRespuestaId` FK) — FR-111, FR-112
-- [ ] T007 [P] Crear value object `Ubicacion` (owned type EF Core) en `backend/src/Domain/ValueObjects/Ubicacion.cs` (`Departamento`/`Provincia`/`Distrito`/`CentroPoblado`/`Direccion`/`Referencia` nullable, `Latitud`/`Longitud` requeridas rango -90..90/-180..180, `Ambito` enum **Terrestre/Marítimo/Aéreo/Mixto** (4 valores, igual que `TipoEmergencia.Ambito` — corregido tras Analyze I1), `+SinDireccionFormal` bool default false — corregido tras Analyze I2) — FR-104. Validador: Departamento/Provincia/Distrito requeridos **salvo que `SinDireccionFormal == true`** (no se infiere de `Ambito`)
-- [ ] T008 Extender entidad `Emergencia` en `backend/src/Domain/Entities/Emergencia.cs`: `+TipoEmergenciaId` FK (nullable durante migración), `+Ubicacion` (owned type de T007), `+Afectados`/`Heridos`/`Desaparecidos`/`Fallecidos`/`Evacuados` (int, default 0); conservar `Tipo` (texto libre) como columna legada de solo lectura (Principio IV, no se borra) — FR-105, FR-125
-- [ ] T009 Extender entidad `UnidadRespuesta` en `backend/src/Domain/Entities/UnidadRespuesta.cs`: `+Ubicacion` (owned type de T007), `+InstitucionId` FK, `+UsuarioId` FK nullable a `AspNetUsers`, `+ICollection<Personal>`, `+ICollection<Recurso>`
-- [ ] T010 Agregar los 5 roles nuevos (`Administrador`, `CoordinadorLogistico`, `JefeDeUnidad`, `UnidadDeRespuesta`, `Visualizador`) como constantes en `backend/src/Domain/Constants/Roles.cs`, junto a `Operador`/`Supervisor` ya existentes — FR-117
-- [ ] T011 Extender `ApplicationUser` (Identity) en `backend/src/Infrastructure/Identity/ApplicationUser.cs`: `+InstitucionId` FK nullable, `+UltimoAcceso` DateTime nullable, `+RequiereCambioPassword` bool default false, `+CreadoPor`/`ModificadoPor` string FK a `AspNetUsers.Id` — FR-118, FR-119
-- [ ] T012 Configurar EF Core para las entidades/owned types nuevos en `backend/src/Infrastructure/Data/Configurations/{Institucion,TipoEmergencia,Personal,Recurso}Configuration.cs`, y actualizar `EmergenciaConfiguration`/`UnidadRespuestaConfiguration` para mapear `Ubicacion` como owned type
-- [ ] T013 Generar y aplicar la migración EF Core `AmpliacionOperativaNacional` (`dotnet ef migrations add` en `backend/src/Infrastructure/Migrations`) contra el MySQL existente (`sige_app`), verificando el esquema resultante
-- [ ] T014 Sembrar los 5 roles nuevos de forma idempotente (`RoleManager.RoleExistsAsync` antes de crear) en `backend/src/Infrastructure/Data/ApplicationDbContextInitialiser.cs` — FR-117, FR-123
-- [ ] T015 Implementar la migración de datos de FR-103 en `ApplicationDbContextInitialiser`: para cada `Emergencia` con `TipoEmergenciaId == null`, buscar `TipoEmergencia` por nombre (case-insensitive) o crearlo **activo** por defecto, y vincular — algoritmo exacto en `data-model.md` §"Migración de datos"
-- [ ] T016 Condicionar la ejecución del seed de roles/usuarios/datos demo (T014, y los de US2) a `env.IsDevelopment() || env.EnvironmentName is "Demo" or "Testing"`, nunca en Production — FR-124
-- [ ] T016a [P] Sembrar el catálogo inicial de `Institucion` (bomberos, policía, salud, marina, etc.) de forma idempotente en `ApplicationDbContextInitialiser` — **agregado tras Analyze (hallazgo C2)**: `Personal`, `UnidadRespuesta` y `Usuario` referencian `InstitucionId` y necesitan filas existentes antes de poder crearse
-- [ ] T016b Query `ListarInstitucionesQuery` + endpoint `GET /api/Instituciones` (autenticado) en `backend/src/Application/Instituciones/Queries/` y `backend/src/Web/Endpoints/Instituciones.cs` — **agregado tras Analyze (hallazgo C2)**: sin esto, ningún selector de institución en el frontend (Usuario, Personal, Unidad) tiene de dónde leer las opciones
+- [x] T003 [P] Crear entidad `Institucion` en `backend/src/Domain/Entities/Institucion.cs` (`Nombre` string requerido único, `Activo` bool default true) — catálogo único compartido (data-model.md, CHK038)
+- [x] T004 [P] Crear entidad `TipoEmergencia` en `backend/src/Domain/Entities/TipoEmergencia.cs` (`Nombre` string requerido único máx. 100 caracteres, `Ambito` enum Terrestre/Marítimo/Aéreo/Mixto, `Icono` string, `Color` string hex, `PrioridadPorDefecto` enum del MVP, `Activo` bool default true) — FR-101
+- [x] T005 [P] Crear entidad `Personal` en `backend/src/Domain/Entities/Personal.cs` (`Nombres`/`Apellidos`/`Documento` requeridos, `InstitucionId` FK, `Especialidad`, `Funcion`, `Certificaciones` nullable, `Disponible` bool default true, `UnidadRespuestaId` FK) — FR-110
+- [x] T006 [P] Crear entidad `Recurso` en `backend/src/Domain/Entities/Recurso.cs` (`Codigo`/`Nombre` requeridos, `Categoria` enum Equipos/Herramientas/Víveres/Líquidos/Estructuras/MaterialMédico/EquipoRescate, `UnidadMedida`, `Cantidad`, `CantidadDisponible`, `CantidadMinima`, `UnidadRespuestaId` FK) — FR-111, FR-112
+- [x] T007 [P] Crear value object `Ubicacion` (owned type EF Core) en `backend/src/Domain/ValueObjects/Ubicacion.cs` (`Departamento`/`Provincia`/`Distrito`/`CentroPoblado`/`Direccion`/`Referencia` nullable, `Latitud`/`Longitud` requeridas rango -90..90/-180..180, `Ambito` enum **Terrestre/Marítimo/Aéreo/Mixto** (4 valores, igual que `TipoEmergencia.Ambito` — corregido tras Analyze I1), `+SinDireccionFormal` bool default false — corregido tras Analyze I2) — FR-104. Validador: Departamento/Provincia/Distrito requeridos **salvo que `SinDireccionFormal == true`** (no se infiere de `Ambito`)
+- [x] T008 Extender entidad `Emergencia` en `backend/src/Domain/Entities/Emergencia.cs`: `+TipoEmergenciaId` FK (nullable durante migración), `+Ubicacion` (owned type de T007), `+Afectados`/`Heridos`/`Desaparecidos`/`Fallecidos`/`Evacuados` (int, default 0); conservar `Tipo` (texto libre) como columna legada de solo lectura (Principio IV, no se borra) — FR-105, FR-125
+- [x] T009 Extender entidad `UnidadRespuesta` en `backend/src/Domain/Entities/UnidadRespuesta.cs`: `+Ubicacion` (owned type de T007), `+InstitucionId` FK, `+UsuarioId` FK nullable a `AspNetUsers`, `+ICollection<Personal>`, `+ICollection<Recurso>`
+- [x] T010 Agregar los 5 roles nuevos (`Administrador`, `CoordinadorLogistico`, `JefeDeUnidad`, `UnidadDeRespuesta`, `Visualizador`) como constantes en `backend/src/Domain/Constants/Roles.cs`, junto a `Operador`/`Supervisor` ya existentes — FR-117
+- [x] T011 Extender `ApplicationUser` (Identity) en `backend/src/Infrastructure/Identity/ApplicationUser.cs`: `+InstitucionId` FK nullable, `+UltimoAcceso` DateTime nullable, `+RequiereCambioPassword` bool default false, `+CreadoPor`/`ModificadoPor` string FK a `AspNetUsers.Id` — FR-118, FR-119
+- [x] T012 Configurar EF Core para las entidades/owned types nuevos en `backend/src/Infrastructure/Data/Configurations/{Institucion,TipoEmergencia,Personal,Recurso}Configuration.cs`, y actualizar `EmergenciaConfiguration`/`UnidadRespuestaConfiguration` para mapear `Ubicacion` como owned type
+- [x] T013 Generar y aplicar la migración EF Core `AmpliacionOperativaNacional` (`dotnet ef migrations add` en `backend/src/Infrastructure/Migrations`) contra el MySQL existente (`sige_app`), verificando el esquema resultante
+- [x] T014 Sembrar los 5 roles nuevos de forma idempotente (`RoleManager.RoleExistsAsync` antes de crear) en `backend/src/Infrastructure/Data/ApplicationDbContextInitialiser.cs` — FR-117, FR-123
+- [x] T015 Implementar la migración de datos de FR-103 en `ApplicationDbContextInitialiser`: para cada `Emergencia` con `TipoEmergenciaId == null`, buscar `TipoEmergencia` por nombre (case-insensitive) o crearlo **activo** por defecto, y vincular — algoritmo exacto en `data-model.md` §"Migración de datos"
+- [x] T016 Condicionar la ejecución del seed de roles/usuarios/datos demo (T014, y los de US2) a `env.IsDevelopment() || env.EnvironmentName is "Demo" or "Testing"`, nunca en Production — FR-124
+- [x] T016a [P] Sembrar el catálogo inicial de `Institucion` (bomberos, policía, salud, marina, etc.) de forma idempotente en `ApplicationDbContextInitialiser` — **agregado tras Analyze (hallazgo C2)**: `Personal`, `UnidadRespuesta` y `Usuario` referencian `InstitucionId` y necesitan filas existentes antes de poder crearse
+- [x] T016b Query `ListarInstitucionesQuery` + endpoint `GET /api/Instituciones` (autenticado) en `backend/src/Application/Instituciones/Queries/` y `backend/src/Web/Endpoints/Instituciones.cs` — **agregado tras Analyze (hallazgo C2)**: sin esto, ningún selector de institución en el frontend (Usuario, Personal, Unidad) tiene de dónde leer las opciones
 
 **Checkpoint**: esquema de base de datos migrado, roles nuevos sembrados de forma
 idempotente, emergencias del MVP vinculadas al catálogo de tipos, catálogo de
@@ -111,8 +111,8 @@ sin ninguna acción manual, existen los usuarios demo documentados y datos varia
 
 ### Implementación de User Story 2
 
-- [ ] T027 [US2] Extender `ApplicationDbContextInitialiser` para crear, si no existen (`UserManager.FindByNameAsync` antes de `CreateAsync`), los 10 usuarios demo de la sección 19.1 del documento de origen (`admin.sige`, `supervisor.sige`, `operador.lima`, `operador.norte`, `logistica.sige`, `jefe.unidad01`, `unidad.maritima01`, `unidad.terrestre01`, `visor.sige`, `prueba.restringida`), con contraseña desde `SIGE_DEMO_PASSWORD` — FR-122
-- [ ] T028 [US2] Crear `backend/src/Infrastructure/Data/DemoDataSeeder.cs`: genera (solo si las tablas están vacías) 40–60 emergencias, 25–40 unidades, 60–100 personal y 100+ recursos variados, invocado desde `ApplicationDbContextInitialiser` — FR-122
+- [x] T027 [US2] Extender `ApplicationDbContextInitialiser` para crear, si no existen (`UserManager.FindByNameAsync` antes de `CreateAsync`), los 10 usuarios demo de la sección 19.1 del documento de origen (`admin.sige`, `supervisor.sige`, `operador.lima`, `operador.norte`, `logistica.sige`, `jefe.unidad01`, `unidad.maritima01`, `unidad.terrestre01`, `visor.sige`, `prueba.restringida`), con contraseña desde `SIGE_DEMO_PASSWORD` — FR-122
+- [x] T028 [US2] Crear `backend/src/Infrastructure/Data/DemoDataSeeder.cs`: genera (solo si las tablas están vacías) 40–60 emergencias, 25–40 unidades, 60–100 personal y 100+ recursos variados, invocado desde `ApplicationDbContextInitialiser` — FR-122
 - [ ] T029 [P] [US2] Documentar las credenciales demo (usuario/rol) en un archivo local no expuesto en producción (por ejemplo `backend/docs/usuarios-demo.md`), acorde a la sección 19.4 del documento de origen
 
 **Checkpoint**: US2 completamente funcional; conteos verificados antes/después de un
@@ -130,15 +130,15 @@ registra una emergencia de ese tipo solo con coordenadas.
 
 ### Tests para User Story 3
 
-- [ ] T030 [P] [US3] Prueba unitaria del validador de `Ubicacion`: latitud/longitud siempre requeridas; departamento/provincia/distrito requeridos **salvo que `SinDireccionFormal == true`** (corregido tras Analyze I2 — no se infiere de `Ambito`) en `backend/tests/Application.UnitTests/Emergencias/UbicacionValidatorTests.cs` — FR-104
+- [x] T030 [P] [US3] Prueba unitaria del validador de `Ubicacion`: latitud/longitud siempre requeridas; departamento/provincia/distrito requeridos **salvo que `SinDireccionFormal == true`** (corregido tras Analyze I2 — no se infiere de `Ambito`) en `backend/tests/Application.UnitTests/Emergencias/UbicacionValidatorTests.cs` — FR-104
 
 ### Implementación de User Story 3
 
 - [ ] T031 [US3] Commands `CrearTipoEmergencia`, `EditarTipoEmergencia` (activar/desactivar) en `backend/src/Application/TiposEmergencia/Commands/` — `[Authorize(Roles = "Administrador")]` — FR-101, FR-102
 - [ ] T032 [US3] Query `ListarTiposEmergenciaQuery` (`?soloActivos=true`) en `backend/src/Application/TiposEmergencia/Queries/ListarTiposEmergenciaQuery.cs`
 - [ ] T033 [US3] Endpoint group `backend/src/Web/Endpoints/TiposEmergencia.cs`
-- [ ] T034 [US3] Actualizar `CrearEmergenciaCommand`/validador para aceptar `tipoEmergenciaId` y `Ubicacion` completa, rechazando tipos desactivados — FR-102, FR-104, FR-105
-- [ ] T035 [US3] Actualizar `EmergenciaDto`/`ListarEmergenciasQuery`/`ObtenerEmergenciaPorIdQuery` para incluir el tipo del catálogo y la ubicación completa (coordenada exacta, solo autenticado — FR-115a)
+- [x] T034 [US3] Actualizar `CrearEmergenciaCommand`/validador para aceptar `tipoEmergenciaId` y `Ubicacion` completa, rechazando tipos desactivados — FR-102, FR-104, FR-105 — adelantado durante Foundational: el cambio de esquema de `Emergencia` (T008) forzaba a actualizar este Command para poder compilar
+- [x] T035 [US3] Actualizar `EmergenciaDto`/`ListarEmergenciasQuery`/`ObtenerEmergenciaPorIdQuery` para incluir el tipo del catálogo y la ubicación completa (coordenada exacta, solo autenticado — FR-115a) — adelantado durante Foundational, mismo motivo que T034
 - [ ] T036 [P] [US3] Frontend: selector de tipo/subtipo dependiente + campos de ubicación (departamento/provincia/distrito/centro poblado/dirección/referencia, ocultos/opcionales cuando se marca el checkbox "sin dirección formal" — corregido tras Analyze I2, no depende del ámbito) en `frontend/src/app/views/emergencias/emergencias.component.ts`
 - [ ] T037 [P] [US3] Frontend: administración simple del catálogo de tipos (crear/editar/activar/desactivar) en `frontend/src/app/views/tipos-emergencia/tipos-emergencia.component.ts`
 

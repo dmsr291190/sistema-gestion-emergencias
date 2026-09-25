@@ -12,5 +12,13 @@ public interface IApplicationDbContext
 
     DbSet<EventoAuditoria> EventosAuditoria { get; }
 
+    DbSet<TipoEmergencia> TiposEmergencia { get; }
+
+    DbSet<Institucion> Instituciones { get; }
+
+    DbSet<Personal> Personal { get; }
+
+    DbSet<Recurso> Recursos { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

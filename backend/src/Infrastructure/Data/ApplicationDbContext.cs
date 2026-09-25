@@ -19,6 +19,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
     public DbSet<EventoAuditoria> EventosAuditoria => Set<EventoAuditoria>();
 
+    public DbSet<TipoEmergencia> TiposEmergencia => Set<TipoEmergencia>();
+
+    public DbSet<Institucion> Instituciones => Set<Institucion>();
+
+    public DbSet<Personal> Personal => Set<Personal>();
+
+    public DbSet<Recurso> Recursos => Set<Recurso>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

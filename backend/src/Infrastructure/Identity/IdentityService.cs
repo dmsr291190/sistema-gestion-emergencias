@@ -35,6 +35,7 @@ public class IdentityService : IIdentityService
         {
             UserName = userName,
             Email = userName,
+            NombreCompleto = userName,
         };
 
         var result = await _userManager.CreateAsync(user, password);

@@ -103,7 +103,12 @@ tabla referenciada por `Personal`, `UnidadRespuesta` (dueña de sus recursos) y
 
 ### UnidadRespuesta
 
-- **+ `Ubicacion`** (owned type, mismo shape que Emergencia).
+- **+ `Ubicacion`** (owned type, **nullable/aditivo** — decisión tomada en
+  Implement: a diferencia de `Emergencia`, aquí `Ubicacion` NO reemplaza
+  `Latitud`/`Longitud` porque esos campos representan la posición actual de la
+  unidad, actualizada con frecuencia vía `CambiarEstadoOperativoUnidad`;
+  `Ubicacion` solo agrega los campos de dirección/ámbito cuando se necesitan,
+  por ejemplo para su base).
 - **+ `InstitucionId`** (FK a Institución) — organismo dueño de la unidad
   (bomberos, policía, salud, marina, etc.); se muestra en tooltip/popup del mapa
   (sección 7.2 del documento de origen) y en el detalle de la unidad.

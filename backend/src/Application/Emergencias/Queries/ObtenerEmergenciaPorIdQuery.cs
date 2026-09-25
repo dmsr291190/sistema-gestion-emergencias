@@ -29,10 +29,33 @@ public class ObtenerEmergenciaPorIdQueryHandler : IRequestHandler<ObtenerEmergen
             .Select(e => new EmergenciaDetailDto
             {
                 Id = e.Id,
-                Tipo = e.Tipo,
+                TipoEmergencia = e.TipoEmergencia == null ? null : new TipoEmergenciaResumenDto
+                {
+                    Id = e.TipoEmergencia.Id,
+                    Nombre = e.TipoEmergencia.Nombre,
+                    Ambito = e.TipoEmergencia.Ambito,
+                    Icono = e.TipoEmergencia.Icono,
+                    Color = e.TipoEmergencia.Color
+                },
                 Descripcion = e.Descripcion,
-                Latitud = e.Latitud,
-                Longitud = e.Longitud,
+                Ubicacion = new UbicacionDto
+                {
+                    Departamento = e.Ubicacion.Departamento,
+                    Provincia = e.Ubicacion.Provincia,
+                    Distrito = e.Ubicacion.Distrito,
+                    CentroPoblado = e.Ubicacion.CentroPoblado,
+                    Direccion = e.Ubicacion.Direccion,
+                    Referencia = e.Ubicacion.Referencia,
+                    Latitud = e.Ubicacion.Latitud,
+                    Longitud = e.Ubicacion.Longitud,
+                    Ambito = e.Ubicacion.Ambito,
+                    SinDireccionFormal = e.Ubicacion.SinDireccionFormal
+                },
+                Afectados = e.Afectados,
+                Heridos = e.Heridos,
+                Desaparecidos = e.Desaparecidos,
+                Fallecidos = e.Fallecidos,
+                Evacuados = e.Evacuados,
                 Prioridad = e.Prioridad,
                 Estado = e.Estado,
                 FechaHoraReporte = e.FechaHoraReporte,
