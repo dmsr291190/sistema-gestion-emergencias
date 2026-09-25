@@ -67,7 +67,7 @@ funcionando.
 Un Administrador gestiona las cuentas del sistema: crea usuarios, les asigna uno o
 más de los roles ampliados (Administrador, Supervisor, Operador, Coordinador
 logístico, Jefe de unidad, Unidad de respuesta, Visualizador), bloquea/desbloquea
-cuentas, fuerza el restablecimi.de contraseña, y consulta el historial de seguridad
+cuentas, fuerza el restablecimiento de contraseña, y consulta el historial de seguridad
 de cada cuenta.
 
 **Why this priority**: todo lo demás en esta ampliación (usuarios demo, vista de
@@ -443,7 +443,7 @@ colores de prioridad/estado ya definidos en el MVP (Historia de Usuario 6).
   posición de su propia unidad; el acceso de ese rol MUST limitarse a esa función.
 - **FR-120a**: El sistema MUST limitar el acceso de un usuario con rol
   "Visualizador" a las pantallas de mapa y dashboard en modo solo lectura; ese rol
-  no MUST tener acceso a la administración de usuarios, personal ni recursos
+  MUST NOT tener acceso a la administración de usuarios, personal ni recursos
   (la vista pública sin login, US7, ya cubre la consulta general del ciudadano).
 - **FR-121**: El sistema MUST almacenar las contraseñas mediante un mecanismo de
   hashing seguro; nunca en texto plano.
@@ -454,7 +454,7 @@ colores de prioridad/estado ya definidos en el MVP (Historia de Usuario 6).
   Desarrollo, Demo o Pruebas, los usuarios demo documentados (uno por cada rol
   nuevo) y un volumen variado de emergencias, unidades, personal y recursos.
 - **FR-123**: El proceso de generación de datos demo MUST ser idempotente: ejecutarlo
-  más de una vez no MUST duplicar usuarios, roles ni datos ya creados.
+  más de una vez MUST NOT duplicar usuarios, roles ni datos ya creados.
 - **FR-124**: El sistema MUST impedir que el generador de usuarios y datos demo se
   ejecute en un entorno marcado como Producción.
 

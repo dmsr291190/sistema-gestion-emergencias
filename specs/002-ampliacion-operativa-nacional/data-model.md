@@ -156,5 +156,10 @@ ampliación, fuera de alcance salvo que Diego lo pida).
   `SinDireccionFormal == true` (FR-104) — **no** se infiere de `Ambito` (corregido
   tras Analyze, hallazgo I2).
 - `Recurso.CantidadDisponible <= Recurso.Cantidad`.
-- `Personal.Documento`: requerido, formato validado igual que en el registro de
-  usuarios del MVP.
+- `Personal.Documento`: requerido, máximo 20 caracteres (columna `varchar(20)`)
+  — **corrección tras Analyze (hallazgo U2)**: la referencia original a "el
+  mismo formato que el registro de usuarios del MVP" era incorrecta, el MVP
+  nunca validó ni tuvo un campo de documento de identidad para usuarios
+  (`AspNetUsers` solo usa `Email`/`UserName`); no se define una expresión
+  regular de formato porque el Perú usa varios tipos de documento (DNI, RUC,
+  carné de extranjería) sin un patrón único.

@@ -42,12 +42,12 @@ TOKEN_ADMIN=$(curl -s -X POST http://localhost:4401/api/Users/login \
 
 curl -s -X POST http://localhost:4401/api/Usuarios \
   -H "Authorization: Bearer $TOKEN_ADMIN" -H "Content-Type: application/json" \
-  -d '{"nombre":"Prueba QA","documento":"12345678","email":"qa.prueba@sige.pe","rol":"CoordinadorLogistico"}'
-# → 201
+  -d '{"userName":"qa.prueba","nombreCompleto":"Prueba QA","password":"QaPrueba123!","institucionId":null,"roles":["CoordinadorLogistico"]}'
+# → 201 (devuelve el Id del nuevo usuario)
 
 curl -s -X POST http://localhost:4401/api/Usuarios/{id}/bloquear -H "Authorization: Bearer $TOKEN_ADMIN"
-curl -s -X POST http://localhost:4401/api/Users/login -d '{"email":"qa.prueba@sige.pe","password":"..."}'
-# → 401/403 con mensaje de cuenta bloqueada
+curl -s -X POST http://localhost:4401/api/Users/login -d '{"email":"qa.prueba","password":"QaPrueba123!"}'
+# → 401 LockedOut (nota: el campo "email" del login en realidad se usa como UserName)
 ```
 
 ## Escenario 3 — Login propio de "Unidad de respuesta" (Clarification 1)
@@ -73,17 +73,22 @@ curl -s http://localhost:4401/api/Publico/Emergencias | jq '.'
 # Inspeccionar el JSON completo:
 #   - NO debe contener: documento, telefono, correo, nombreReportante, nombreVictima,
 #     observacionesInternas, latitud/longitud exactas, usuario interno.
-#   - SÍ debe contener: codigo, tipo, prioridad, estado, distrito/centroPoblado.
+#   - SÍ debe contener: codigo, tipoNombre, prioridad, estado,
+#     ubicacion.{distrito,centroPoblado,latitudAproximada,longitudAproximada}.
 ```
 
 ## Escenario 6 — Personal y recursos con alerta de bajo stock (US5)
 
 ```bash
-curl -s -X POST http://localhost:4401/api/Unidades/1/recursos \
-  -H "Authorization: Bearer $TOKEN_ADMIN" -H "Content-Type: application/json" \
-  -d '{"codigo":"AGUA-01","nombre":"Bidones de agua","categoria":"Liquidos","cantidad":50,"cantidadDisponible":3,"cantidadMinima":10}'
+TOKEN_LOG=$(curl -s -X POST http://localhost:4401/api/Users/login -d '{"email":"logistica.sige","password":"DemoSige#2026"}' | jq -r .accessToken)
 
-curl -s http://localhost:4401/api/Unidades/1/recursos -H "Authorization: Bearer $TOKEN_ADMIN" | jq '.[] | select(.bajoStock == true)'
+curl -s -X POST http://localhost:4401/api/Unidades/1/recursos \
+  -H "Authorization: Bearer $TOKEN_LOG" -H "Content-Type: application/json" \
+  -d '{"codigo":"AGUA-01","nombre":"Bidones de agua","categoria":3,"unidadMedida":"unidad","cantidad":50,"cantidadDisponible":3,"cantidadMinima":10}'
+# categoria es numerica (enum): 0 Equipos, 1 Herramientas, 2 Viveres, 3 Liquidos,
+# 4 Estructuras, 5 MaterialMedico, 6 EquipoRescate.
+
+curl -s http://localhost:4401/api/Unidades/1/recursos -H "Authorization: Bearer $TOKEN_LOG" | jq '.[] | select(.bajoStock == true)'
 # → debe listar el recurso recién creado
 ```
 
