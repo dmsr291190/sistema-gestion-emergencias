@@ -213,15 +213,15 @@ resumen de una emergencia, verificando que ningún dato restringido aparece.
 
 ### Tests para User Story 7
 
-- [ ] T052 [P] [US7] Prueba de integración: `GET /api/Publico/Emergencias` y `GET /api/Publico/Emergencias/{codigo}` sin `Authorization`, inspeccionando el **cuerpo completo** de la respuesta para confirmar la ausencia de todos los campos de FR-114, en `backend/tests/Application.FunctionalTests/Publico/RedaccionDatosPublicosTests.cs` — SC-105
+- [x] T052 [P] [US7] Prueba: ausencia de todos los campos de FR-114, verificada de dos formas complementarias — (1) `backend/tests/Application.UnitTests/Publico/RedaccionDatosPublicosTests.cs` (InMemory: guard por reflexión sobre los DTOs + verificación de que la ubicación devuelta no es la exacta), en vez de `Application.FunctionalTests` porque esa infraestructura exige una base MySQL de pruebas real (`ConnectionStrings__SigeDbTest`) nunca aprovisionada ni en el MVP ni aquí; y (2) `curl` real sin `Authorization` contra el backend en ejecución, inspeccionando el **cuerpo completo** de la respuesta (`quickstart.md` Escenario 5) — SC-105
 
 ### Implementación de User Story 7
 
-- [ ] T053 [US7] DTOs propios `EmergenciaPublicaDto`/`EmergenciaPublicaDetalleDto` (nunca reutilizan el DTO interno) en `backend/src/Application/Publico/`
-- [ ] T054 [US7] Queries `ListarEmergenciasPublicasQuery`/`ObtenerEmergenciaPublicaQuery` (ubicación aproximada por centroide de distrito, sin `[Authorize]`) en `backend/src/Application/Publico/Queries/`
-- [ ] T055 [US7] Endpoint group anónimo `backend/src/Web/Endpoints/Publico.cs`: `GET /api/Publico/Emergencias`, `GET /api/Publico/Emergencias/{codigo}` (404 genérico si no existe o está fuera de alcance público)
-- [ ] T056 [P] [US7] Frontend: vista pública fuera del layout autenticado (mapa, listado, filtros, leyenda, timeline pública) en `frontend/src/app/views/publico/publico.component.ts`
-- [ ] T057 [US7] Registrar la ruta pública sin `authGuard` en `frontend/src/app/app.routes.ts`
+- [x] T053 [US7] DTOs propios `EmergenciaPublicaDto`/`EmergenciaPublicaDetalleDto` (nunca reutilizan el DTO interno) en `backend/src/Application/Publico/`
+- [x] T054 [US7] Queries `ListarEmergenciasPublicasQuery`/`ObtenerEmergenciaPublicaQuery`, sin `[Authorize]`, en `backend/src/Application/Publico/Queries/` — **desviación de research.md §3**: la ubicación aproximada se implementó redondeando lat/lon a 1 decimal (~11 km) en memoria tras materializar la consulta, no con un centroide de distrito precalculado (no existe un catálogo de centroides en `data-model.md`); sigue cumpliendo FR-115 (nunca la coordenada exacta)
+- [x] T055 [US7] Endpoint group anónimo `backend/src/Web/Endpoints/Publico.cs`: `GET /api/Publico/Emergencias`, `GET /api/Publico/Emergencias/{codigo}` (404 genérico si no existe o está fuera de alcance público)
+- [x] T056 [P] [US7] Frontend: vista pública fuera del layout autenticado (mapa, listado, filtros, leyenda, timeline pública) en `frontend/src/app/views/publico/publico.component.ts`
+- [x] T057 [US7] Registrar la ruta pública sin `authGuard` en `frontend/src/app/app.routes.ts`
 
 **Checkpoint**: US7 completamente funcional; SC-105 verificado con `curl` real, no
 solo con la pantalla.

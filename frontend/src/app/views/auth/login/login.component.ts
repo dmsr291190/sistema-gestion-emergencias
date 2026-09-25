@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CardBodyComponent, CardComponent, CardHeaderComponent } from '@coreui/angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { FormFieldComponent } from '../../../shared/form-field/form-field.component';
@@ -12,7 +12,7 @@ import { FormFieldComponent } from '../../../shared/form-field/form-field.compon
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CardComponent, CardHeaderComponent, CardBodyComponent, FormFieldComponent],
+  imports: [FormsModule, RouterLink, CardComponent, CardHeaderComponent, CardBodyComponent, FormFieldComponent],
   template: `
     <div class="d-flex justify-content-center align-items-center min-vh-100 bg-body-tertiary">
       <c-card style="width: 24rem;">
@@ -34,6 +34,9 @@ import { FormFieldComponent } from '../../../shared/form-field/form-field.compon
           </form>
           <p class="text-body-secondary small mt-3 mb-0">
             Demo: operador&#64;sige.local / Operador123! — supervisor&#64;sige.local / Supervisor123!
+          </p>
+          <p class="text-center small mt-3 mb-0">
+            <a routerLink="/publico">Ver mapa público de emergencias (sin iniciar sesión)</a>
           </p>
         </c-card-body>
       </c-card>

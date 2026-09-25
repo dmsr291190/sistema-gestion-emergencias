@@ -15,9 +15,13 @@ import { DespachoComponent } from './views/despacho/despacho.component';
 import { UsuariosComponent } from './views/usuarios/usuarios.component';
 import { MiUnidadComponent } from './views/mi-unidad/mi-unidad.component';
 import { TiposEmergenciaComponent } from './views/tipos-emergencia/tipos-emergencia.component';
+import { PublicoComponent } from './views/publico/publico.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  // FR-113: vista pública sin autenticación -- fuera del layout autenticado y
+  // sin authGuard.
+  { path: 'publico', component: PublicoComponent },
   {
     path: '',
     component: DefaultLayoutComponent,
