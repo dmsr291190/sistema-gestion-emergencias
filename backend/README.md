@@ -27,6 +27,17 @@ decisiones y tareas de cada feature viven en `../specs/`.
     --routines --triggers --skip-comments SigeDb > database/schema.sql
   ```
 
+- **Volcado completo con datos de demostración**: [`database/schema_con_datos.sql`](database/schema_con_datos.sql) —
+  la misma base con las filas generadas por `DemoDataSeeder` (sintéticas:
+  "Personal Demo", documentos `DEMO000xxx`, unidades `DEMO-xxx`; ningún dato
+  real). Sirve para restaurar un entorno de demo completo sin levantar el
+  backend. Se regenera con:
+
+  ```bash
+  docker exec mysql_local mysqldump -u sige_app -p --no-tablespaces \
+    --routines --triggers --skip-comments --single-transaction SigeDb > database/schema_con_datos.sql
+  ```
+
 - Al arrancar en un entorno de Desarrollo/Demo/Pruebas, `ApplicationDbContextInitialiser`
   aplica las migraciones pendientes y siembra roles, catálogo de tipos de
   emergencia, instituciones y datos demo automáticamente — no requiere pasos
