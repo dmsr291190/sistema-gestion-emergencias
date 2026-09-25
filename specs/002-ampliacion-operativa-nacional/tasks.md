@@ -107,13 +107,13 @@ sin ninguna acción manual, existen los usuarios demo documentados y datos varia
 
 ### Tests para User Story 2
 
-- [ ] T026 [P] [US2] Prueba unitaria de idempotencia: ejecutar el seed dos veces contra una base en memoria y verificar que los conteos de usuarios/roles/datos no cambian en la segunda ejecución, en `backend/tests/Application.UnitTests/Seed/SeedIdempotenteTests.cs` — FR-123, SC-103
+- [x] T026 [P] [US2] Prueba unitaria de idempotencia: ejecutar el seed dos veces contra una base en memoria y verificar que los conteos de usuarios/roles/datos no cambian en la segunda ejecución, en `backend/tests/Application.UnitTests/Seed/SeedIdempotenteTests.cs` — FR-123, SC-103
 
 ### Implementación de User Story 2
 
 - [x] T027 [US2] Extender `ApplicationDbContextInitialiser` para crear, si no existen (`UserManager.FindByNameAsync` antes de `CreateAsync`), los 10 usuarios demo de la sección 19.1 del documento de origen (`admin.sige`, `supervisor.sige`, `operador.lima`, `operador.norte`, `logistica.sige`, `jefe.unidad01`, `unidad.maritima01`, `unidad.terrestre01`, `visor.sige`, `prueba.restringida`), con contraseña desde `SIGE_DEMO_PASSWORD` — FR-122
 - [x] T028 [US2] Crear `backend/src/Infrastructure/Data/DemoDataSeeder.cs`: genera (solo si las tablas están vacías) 40–60 emergencias, 25–40 unidades, 60–100 personal y 100+ recursos variados, invocado desde `ApplicationDbContextInitialiser` — FR-122
-- [ ] T029 [P] [US2] Documentar las credenciales demo (usuario/rol) en un archivo local no expuesto en producción (por ejemplo `backend/docs/usuarios-demo.md`), acorde a la sección 19.4 del documento de origen
+- [x] T029 [P] [US2] Documentar las credenciales demo (usuario/rol) en un archivo local no expuesto en producción (por ejemplo `backend/docs/usuarios-demo.md`), acorde a la sección 19.4 del documento de origen
 
 **Checkpoint**: US2 completamente funcional; conteos verificados antes/después de un
 segundo arranque.
