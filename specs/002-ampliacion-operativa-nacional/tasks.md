@@ -265,7 +265,8 @@ verificar consistencia y contraste.
 - [ ] T064 [P] Actualizar `quickstart.md` si algún escenario cambió durante Implement
 - [ ] T065 Ejecutar `dotnet test` (backend) y `ng test` (frontend) completos y documentar el resultado en la bitácora
 - [ ] T066 Revisar los ítems restantes de `checklists/ampliacion-quality.md` (CHK001-CHK036) y dejar una disposición final explícita de cada uno (resuelto / aceptado fuera de alcance / diferido)
-- [ ] T067 Recorrido manual en navegador (1024px) de las pantallas nuevas (usuarios, catálogo de tipos, mapa avanzado, personal/recursos, vista pública, dashboard, tema oscuro)
+- [ ] T067 Recorrido manual en navegador (1024px) de las pantallas nuevas (usuarios, catálogo de tipos, mapa avanzado, personal/recursos, vista pública, dashboard, tema oscuro); incluir explícitamente la verificación de SC-104 (identificar el tipo de al menos 5 marcadores distintos solo por su ícono)
+- [ ] T068 [P] Corregir hallazgos MEDIUM/LOW de `/speckit-analyze` no aplicados en Plan: citar `Recurso.CantidadDisponible <= Recurso.Cantidad` en el validador de T045 (U1); citar el formato de `Personal.Documento` en T044 (U2); corregir el typo "restablecimi.de" en `spec.md` US1 (A1); reescribir FR-120a con "MUST NOT" (A2)
 
 ---
 
