@@ -29,7 +29,7 @@ import { EstadoOperativoUnidad, Unidad } from '../../core/models/unidad.model';
               <select class="form-select" name="emergenciaId" [(ngModel)]="emergenciaId">
                 <option [ngValue]="null">Selecciona una emergencia...</option>
                 @for (e of emergenciasAsignables(); track e.id) {
-                  <option [ngValue]="e.id">#{{ e.id }} — {{ e.tipo }} ({{ estadoLabel[e.estado] }})</option>
+                  <option [ngValue]="e.id">#{{ e.id }} — {{ e.tipoEmergencia?.nombre ?? '(sin tipo)' }} ({{ estadoLabel[e.estado] }})</option>
                 }
               </select>
             </app-form-field>

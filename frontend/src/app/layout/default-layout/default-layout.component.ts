@@ -47,6 +47,7 @@ import { AuthService } from '../../core/services/auth.service';
             }
             @if (auth.isAdministrador()) {
               <c-nav-item><a cNavLink routerLink="/usuarios" routerLinkActive="active">Usuarios</a></c-nav-item>
+              <c-nav-item><a cNavLink routerLink="/tipos-emergencia" routerLinkActive="active">Catálogo</a></c-nav-item>
             }
           </c-nav>
         </c-header-nav>

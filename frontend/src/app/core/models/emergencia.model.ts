@@ -15,12 +15,47 @@ export enum EstadoEmergencia {
   Cerrada = 6
 }
 
-export interface Emergencia {
+// FR-105: mismos 4 valores que el backend (Domain.Enums.Ambito).
+export enum Ambito {
+  Terrestre = 0,
+  Maritimo = 1,
+  Aereo = 2,
+  Mixto = 3
+}
+
+export interface TipoEmergenciaResumen {
   id: number;
-  tipo: string;
-  descripcion: string;
+  nombre: string;
+  ambito: Ambito;
+  icono: string | null;
+  color: string | null;
+}
+
+// FR-104: ubicacion completa devuelta para usuarios autenticados (coordenada
+// exacta, FR-115a) — no confundir con la ubicacion redondeada de la vista pública.
+export interface Ubicacion {
+  departamento: string | null;
+  provincia: string | null;
+  distrito: string | null;
+  centroPoblado: string | null;
+  direccion: string | null;
+  referencia: string | null;
   latitud: number;
   longitud: number;
+  ambito: Ambito;
+  sinDireccionFormal: boolean;
+}
+
+export interface Emergencia {
+  id: number;
+  tipoEmergencia: TipoEmergenciaResumen | null;
+  descripcion: string;
+  ubicacion: Ubicacion;
+  afectados: number;
+  heridos: number;
+  desaparecidos: number;
+  fallecidos: number;
+  evacuados: number;
   prioridad: Prioridad;
   estado: EstadoEmergencia;
   fechaHoraReporte: string;
@@ -58,11 +93,28 @@ export interface EmergenciaDetalle extends Emergencia {
   timeline: EventoAuditoria[];
 }
 
-export interface CrearEmergenciaRequest {
-  tipo: string;
-  descripcion: string;
+export interface UbicacionInput {
+  departamento?: string | null;
+  provincia?: string | null;
+  distrito?: string | null;
+  centroPoblado?: string | null;
+  direccion?: string | null;
+  referencia?: string | null;
   latitud: number;
   longitud: number;
+  ambito: Ambito;
+  sinDireccionFormal: boolean;
+}
+
+export interface CrearEmergenciaRequest {
+  tipoEmergenciaId: number;
+  descripcion: string;
+  ubicacion: UbicacionInput;
+  afectados: number;
+  heridos: number;
+  desaparecidos: number;
+  fallecidos: number;
+  evacuados: number;
   prioridad: Prioridad;
   reportanteNombre: string;
   reportanteContacto?: string;

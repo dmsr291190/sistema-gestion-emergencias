@@ -134,13 +134,13 @@ registra una emergencia de ese tipo solo con coordenadas.
 
 ### Implementación de User Story 3
 
-- [ ] T031 [US3] Commands `CrearTipoEmergencia`, `EditarTipoEmergencia` (activar/desactivar) en `backend/src/Application/TiposEmergencia/Commands/` — `[Authorize(Roles = "Administrador")]` — FR-101, FR-102
-- [ ] T032 [US3] Query `ListarTiposEmergenciaQuery` (`?soloActivos=true`) en `backend/src/Application/TiposEmergencia/Queries/ListarTiposEmergenciaQuery.cs`
-- [ ] T033 [US3] Endpoint group `backend/src/Web/Endpoints/TiposEmergencia.cs`
+- [x] T031 [US3] Commands `CrearTipoEmergencia`, `EditarTipoEmergencia` (activar/desactivar) en `backend/src/Application/TiposEmergencia/Commands/` — `[Authorize(Roles = "Administrador")]` — FR-101, FR-102
+- [x] T032 [US3] Query `ListarTiposEmergenciaQuery` (`?soloActivos=true`) en `backend/src/Application/TiposEmergencia/Queries/ListarTiposEmergenciaQuery.cs`
+- [x] T033 [US3] Endpoint group `backend/src/Web/Endpoints/TiposEmergencia.cs`
 - [x] T034 [US3] Actualizar `CrearEmergenciaCommand`/validador para aceptar `tipoEmergenciaId` y `Ubicacion` completa, rechazando tipos desactivados — FR-102, FR-104, FR-105 — adelantado durante Foundational: el cambio de esquema de `Emergencia` (T008) forzaba a actualizar este Command para poder compilar
 - [x] T035 [US3] Actualizar `EmergenciaDto`/`ListarEmergenciasQuery`/`ObtenerEmergenciaPorIdQuery` para incluir el tipo del catálogo y la ubicación completa (coordenada exacta, solo autenticado — FR-115a) — adelantado durante Foundational, mismo motivo que T034
-- [ ] T036 [P] [US3] Frontend: selector de tipo/subtipo dependiente + campos de ubicación (departamento/provincia/distrito/centro poblado/dirección/referencia, ocultos/opcionales cuando se marca el checkbox "sin dirección formal" — corregido tras Analyze I2, no depende del ámbito) en `frontend/src/app/views/emergencias/emergencias.component.ts`
-- [ ] T037 [P] [US3] Frontend: administración simple del catálogo de tipos (crear/editar/activar/desactivar) en `frontend/src/app/views/tipos-emergencia/tipos-emergencia.component.ts`
+- [x] T036 [P] [US3] Frontend: selector de tipo/subtipo dependiente + campos de ubicación (departamento/provincia/distrito/centro poblado/dirección/referencia, ocultos/opcionales cuando se marca el checkbox "sin dirección formal" — corregido tras Analyze I2, no depende del ámbito) en `frontend/src/app/views/emergencias/emergencias.component.ts`
+- [x] T037 [P] [US3] Frontend: administración simple del catálogo de tipos (crear/editar/activar/desactivar) en `frontend/src/app/views/tipos-emergencia/tipos-emergencia.component.ts`
 
 **Checkpoint**: US3 completamente funcional. **Con US1+US2+US3 completas, el
 alcance P1 de esta ampliación es demostrable de punta a punta.**

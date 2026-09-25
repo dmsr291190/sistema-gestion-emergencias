@@ -18,7 +18,7 @@ import { ESTADO_ASIGNACION_LABEL, ESTADO_EMERGENCIA_COLOR, ESTADO_EMERGENCIA_LAB
     @if (emergencia(); as e) {
       <c-card>
         <c-card-header class="d-flex justify-content-between align-items-center">
-          <span>Emergencia #{{ e.id }} — {{ e.tipo }}</span>
+          <span>Emergencia #{{ e.id }} — {{ e.tipoEmergencia?.nombre ?? '(sin tipo)' }}</span>
           <div class="d-flex gap-2">
             @if (e.estado === EstadoEmergencia.Reportada) {
               <button class="btn btn-sm btn-success" (click)="validar()" [disabled]="procesando()">
@@ -40,7 +40,17 @@ import { ESTADO_ASIGNACION_LABEL, ESTADO_EMERGENCIA_COLOR, ESTADO_EMERGENCIA_LAB
         <c-card-body>
           <p>{{ e.descripcion }}</p>
           <p><strong>Reportante:</strong> {{ e.reportanteNombre }} @if (e.reportanteContacto) { ({{ e.reportanteContacto }}) }</p>
-          <p><strong>Ubicacion:</strong> {{ e.latitud }}, {{ e.longitud }}</p>
+          <p>
+            <strong>Ubicacion:</strong>
+            @if (e.ubicacion.distrito) { {{ e.ubicacion.distrito }}, {{ e.ubicacion.provincia }} — }
+            {{ e.ubicacion.latitud }}, {{ e.ubicacion.longitud }}
+          </p>
+          @if (e.afectados || e.heridos || e.desaparecidos || e.fallecidos || e.evacuados) {
+            <p class="small text-body-secondary">
+              Afectados: {{ e.afectados }} · Heridos: {{ e.heridos }} · Desaparecidos: {{ e.desaparecidos }} ·
+              Fallecidos: {{ e.fallecidos }} · Evacuados: {{ e.evacuados }}
+            </p>
+          }
           <p><strong>Estado actual:</strong> <span [ngClass]="'text-' + estadoColor[e.estado]">{{ estadoLabel[e.estado] }}</span></p>
 
           @if (error()) {

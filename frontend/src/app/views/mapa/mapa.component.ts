@@ -58,9 +58,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
 
     this.emergenciasService.listar().subscribe((emergencias) => {
       for (const e of emergencias) {
-        L.marker([e.latitud, e.longitud])
+        L.marker([e.ubicacion.latitud, e.ubicacion.longitud])
           .addTo(this.map!)
-          .bindPopup(`<strong>Emergencia: ${e.tipo}</strong><br>${e.descripcion}`);
+          .bindPopup(`<strong>Emergencia: ${e.tipoEmergencia?.nombre ?? '(sin tipo)'}</strong><br>${e.descripcion}`);
       }
     });
 

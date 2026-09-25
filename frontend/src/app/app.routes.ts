@@ -13,6 +13,7 @@ import { UnidadesComponent } from './views/unidades/unidades.component';
 import { DespachoComponent } from './views/despacho/despacho.component';
 import { UsuariosComponent } from './views/usuarios/usuarios.component';
 import { MiUnidadComponent } from './views/mi-unidad/mi-unidad.component';
+import { TiposEmergenciaComponent } from './views/tipos-emergencia/tipos-emergencia.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -30,6 +31,8 @@ export const routes: Routes = [
       { path: 'despacho', component: DespachoComponent, canActivate: [noVisualizadorGuard] },
       // US1, FR-116: administración de usuarios y roles ampliados (solo Administrador).
       { path: 'usuarios', component: UsuariosComponent, canActivate: [administradorGuard] },
+      // US3, FR-101: catálogo administrable de tipos de emergencia (solo Administrador).
+      { path: 'tipos-emergencia', component: TiposEmergenciaComponent, canActivate: [administradorGuard] },
       // FR-120: pantalla mínima para el rol "Unidad de respuesta".
       { path: 'mi-unidad', component: MiUnidadComponent, canActivate: [unidadDeRespuestaGuard] }
     ]
