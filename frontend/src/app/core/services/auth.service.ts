@@ -30,6 +30,13 @@ export class AuthService {
   readonly roles = computed(() => this._roles());
   readonly isSupervisor = computed(() => this._roles().includes('Supervisor'));
 
+  // FR-117: roles nuevos de la Ampliación Operativa Nacional.
+  readonly isAdministrador = computed(() => this._roles().includes('Administrador'));
+  readonly isCoordinadorLogistico = computed(() => this._roles().includes('CoordinadorLogistico'));
+  readonly isJefeDeUnidad = computed(() => this._roles().includes('JefeDeUnidad'));
+  readonly isUnidadDeRespuesta = computed(() => this._roles().includes('UnidadDeRespuesta'));
+  readonly isVisualizador = computed(() => this._roles().includes('Visualizador'));
+
   constructor(private readonly http: HttpClient) {}
 
   get token(): string | null {

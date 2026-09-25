@@ -1,7 +1,13 @@
 export enum TipoUnidad {
   Ambulancia = 0,
   Bomberos = 1,
-  Patrullero = 2
+  Patrullero = 2,
+  // Sección 6.2 del documento de origen (ampliación 002).
+  VehiculoRescate = 3,
+  CamionLogistico = 4,
+  Embarcacion = 5,
+  Helicoptero = 6,
+  PuestoDeComando = 7
 }
 
 export enum EstadoOperativoUnidad {

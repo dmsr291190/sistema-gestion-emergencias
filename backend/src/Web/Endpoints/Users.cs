@@ -19,9 +19,17 @@ public class Users : IEndpointGroup
     // Los access tokens de Identity son opacos (no un JWT auto-contenido), asi que
     // el frontend no puede leer el rol del token directamente; este endpoint expone
     // el rol del usuario autenticado (FR-012) para decidir que mostrar en la UI.
+    // FR-119: tambien registra el ultimo acceso -- MapIdentityApi's login no expone
+    // un punto de extension propio, y el frontend siempre llama a /me justo despues
+    // de iniciar sesion, asi que este es el lugar pragmatico para registrarlo.
     [EndpointSummary("Usuario autenticado actual")]
-    public static Ok<MeResponse> Me(IUser user)
+    public static async Task<Ok<MeResponse>> Me(IUser user, IIdentityService identityService)
     {
+        if (user.Id != null)
+        {
+            await identityService.RegistrarUltimoAccesoAsync(user.Id);
+        }
+
         return TypedResults.Ok(new MeResponse(user.Id, user.Roles ?? []));
     }
 

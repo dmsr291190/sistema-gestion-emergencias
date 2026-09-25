@@ -37,9 +37,17 @@ import { AuthService } from '../../core/services/auth.service';
           <c-nav>
             <c-nav-item><a cNavLink routerLink="/dashboard" routerLinkActive="active">Dashboard</a></c-nav-item>
             <c-nav-item><a cNavLink routerLink="/mapa" routerLinkActive="active">Mapa</a></c-nav-item>
-            <c-nav-item><a cNavLink routerLink="/emergencias" routerLinkActive="active">Emergencias</a></c-nav-item>
-            <c-nav-item><a cNavLink routerLink="/unidades" routerLinkActive="active">Unidades</a></c-nav-item>
-            <c-nav-item><a cNavLink routerLink="/despacho" routerLinkActive="active">Despacho</a></c-nav-item>
+            @if (!auth.isVisualizador() && !auth.isUnidadDeRespuesta()) {
+              <c-nav-item><a cNavLink routerLink="/emergencias" routerLinkActive="active">Emergencias</a></c-nav-item>
+              <c-nav-item><a cNavLink routerLink="/unidades" routerLinkActive="active">Unidades</a></c-nav-item>
+              <c-nav-item><a cNavLink routerLink="/despacho" routerLinkActive="active">Despacho</a></c-nav-item>
+            }
+            @if (auth.isUnidadDeRespuesta()) {
+              <c-nav-item><a cNavLink routerLink="/mi-unidad" routerLinkActive="active">Mi unidad</a></c-nav-item>
+            }
+            @if (auth.isAdministrador()) {
+              <c-nav-item><a cNavLink routerLink="/usuarios" routerLinkActive="active">Usuarios</a></c-nav-item>
+            }
           </c-nav>
         </c-header-nav>
         <button class="btn btn-sm btn-outline-secondary" (click)="logout()">Salir</button>
@@ -52,7 +60,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class DefaultLayoutComponent {
   constructor(
-    private readonly auth: AuthService,
+    readonly auth: AuthService,
     private readonly router: Router
   ) {}
 

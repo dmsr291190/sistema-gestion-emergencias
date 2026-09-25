@@ -66,7 +66,12 @@ export const ESTADO_ASIGNACION_LABEL: Record<number, string> = {
 export const TIPO_UNIDAD_LABEL: Record<number, string> = {
   0: 'Ambulancia',
   1: 'Bomberos',
-  2: 'Patrullero'
+  2: 'Patrullero',
+  3: 'Vehículo de rescate',
+  4: 'Camión logístico',
+  5: 'Embarcación',
+  6: 'Helicóptero',
+  7: 'Puesto de comando'
 };
 
 export const ESTADO_OPERATIVO_UNIDAD_LABEL: Record<number, string> = {

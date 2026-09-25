@@ -76,21 +76,21 @@ emergencia ni unidad todavía.
 
 ### Tests para User Story 1
 
-- [ ] T017 [P] [US1] Prueba unitaria: solo `Administrador` puede ejecutar los Commands/Queries de `Usuarios` en `backend/tests/Application.UnitTests/Usuarios/AutorizacionUsuariosTests.cs` — FR-116
-- [ ] T018 [P] [US1] Prueba unitaria: un usuario con rol `Visualizador` es rechazado por los Commands de administración de usuarios y por los de Personal/Recursos en `backend/tests/Application.UnitTests/Usuarios/AutorizacionVisualizadorTests.cs` — FR-120a
+- [x] T017 [P] [US1] Prueba unitaria: solo `Administrador` puede ejecutar los Commands/Queries de `Usuarios` en `backend/tests/Application.UnitTests/Usuarios/AutorizacionUsuariosTests.cs` — FR-116
+- [x] T018 [P] [US1] Prueba unitaria: un usuario con rol `Visualizador` es rechazado por los Commands de administración de usuarios y por los de Personal/Recursos en `backend/tests/Application.UnitTests/Usuarios/AutorizacionVisualizadorTests.cs` — FR-120a
 
 ### Implementación de User Story 1
 
-- [ ] T019 [US1] Commands `CrearUsuario`, `EditarUsuario`, `BloquearUsuario`, `DesbloquearUsuario`, `ForzarCambioPassword` (con `[Authorize(Roles = "Administrador")]`) en `backend/src/Application/Usuarios/Commands/`
-- [ ] T020 [US1] Query `ListarUsuariosQuery` (rol, estado, último acceso, intentos fallidos) en `backend/src/Application/Usuarios/Queries/ListarUsuariosQuery.cs` — FR-119
-- [ ] T021 [US1] Endpoint group `backend/src/Web/Endpoints/Usuarios.cs`: `POST /api/Usuarios`, `PATCH /api/Usuarios/{id}`, `POST /api/Usuarios/{id}/bloquear`, `POST /api/Usuarios/{id}/desbloquear`, `POST /api/Usuarios/{id}/forzar-cambio-password`, `GET /api/Usuarios`
-- [ ] T022 [US1] Registrar `UltimoAcceso` e incrementar `IntentosFallidos` (vía `SignInManager`/`AccessFailedCount` de Identity) en el flujo de login existente (`backend/src/Web/Endpoints/Users.cs`) — FR-119
-- [ ] T023 [P] [US1] Servicio Angular `UsuariosService` en `frontend/src/app/core/services/usuarios.service.ts`
-- [ ] T024 [P] [US1] Vista Angular de administración de usuarios (listar, crear, editar, bloquear/desbloquear, forzar cambio de password) en `frontend/src/app/views/usuarios/usuarios.component.ts`, reutilizando `app-form-field`
-- [ ] T025 [US1] Restringir el enlace "Usuarios" del layout/sidebar al rol `Administrador` en `frontend/src/app/layout/default-layout/`
-- [ ] T025a [P] [US1] Prueba unitaria: un usuario con rol `UnidadDeRespuesta` no puede cambiar el estado operativo de una unidad distinta a la suya (`UnidadRespuesta.UsuarioId != IUser.Id`) en `backend/tests/Application.UnitTests/Unidades/AutorizacionUnidadPropiaTests.cs` — **agregado tras Analyze (hallazgo C1)** — FR-120
-- [ ] T025b [US1] Implementar la restricción en `CambiarEstadoOperativoUnidadCommand` (`backend/src/Application/Unidades/Commands/CambiarEstadoOperativoUnidad/`): si el único rol del caller es `UnidadDeRespuesta`, exigir `UnidadRespuesta.UsuarioId == IUser.Id`; Operador/Supervisor no quedan sujetos a esta restricción — **agregado tras Analyze (hallazgo C1)** — FR-120
-- [ ] T025c [P] [US1] Frontend: vista mínima "mi unidad" (`frontend/src/app/views/mi-unidad/mi-unidad.component.ts`) restringida por guard de rol `UnidadDeRespuesta`, que solo permite ver/actualizar el estado operativo y la posición de la propia unidad — **agregado tras Analyze (hallazgo C1)** — FR-120
+- [x] T019 [US1] Commands `CrearUsuario`, `EditarUsuario`, `BloquearUsuario`, `DesbloquearUsuario`, `ForzarCambioPassword` (con `[Authorize(Roles = "Administrador")]`) en `backend/src/Application/Usuarios/Commands/`
+- [x] T020 [US1] Query `ListarUsuariosQuery` (rol, estado, último acceso, intentos fallidos) en `backend/src/Application/Usuarios/Queries/ListarUsuariosQuery.cs` — FR-119
+- [x] T021 [US1] Endpoint group `backend/src/Web/Endpoints/Usuarios.cs`: `POST /api/Usuarios`, `PATCH /api/Usuarios/{id}`, `POST /api/Usuarios/{id}/bloquear`, `POST /api/Usuarios/{id}/desbloquear`, `POST /api/Usuarios/{id}/forzar-cambio-password`, `GET /api/Usuarios`
+- [x] T022 [US1] Registrar `UltimoAcceso` e incrementar `IntentosFallidos` (vía `SignInManager`/`AccessFailedCount` de Identity) en el flujo de login existente (`backend/src/Web/Endpoints/Users.cs`) — FR-119
+- [x] T023 [P] [US1] Servicio Angular `UsuariosService` en `frontend/src/app/core/services/usuarios.service.ts`
+- [x] T024 [P] [US1] Vista Angular de administración de usuarios (listar, crear, editar, bloquear/desbloquear, forzar cambio de password) en `frontend/src/app/views/usuarios/usuarios.component.ts`, reutilizando `app-form-field`
+- [x] T025 [US1] Restringir el enlace "Usuarios" del layout/sidebar al rol `Administrador` en `frontend/src/app/layout/default-layout/`
+- [x] T025a [P] [US1] Prueba unitaria: un usuario con rol `UnidadDeRespuesta` no puede cambiar el estado operativo de una unidad distinta a la suya (`UnidadRespuesta.UsuarioId != IUser.Id`) en `backend/tests/Application.UnitTests/Unidades/AutorizacionUnidadPropiaTests.cs` — **agregado tras Analyze (hallazgo C1)** — FR-120
+- [x] T025b [US1] Implementar la restricción en `CambiarEstadoOperativoUnidadCommand` (`backend/src/Application/Unidades/Commands/CambiarEstadoOperativoUnidad/`): si el único rol del caller es `UnidadDeRespuesta`, exigir `UnidadRespuesta.UsuarioId == IUser.Id`; Operador/Supervisor no quedan sujetos a esta restricción — **agregado tras Analyze (hallazgo C1)** — FR-120
+- [x] T025c [P] [US1] Frontend: vista mínima "mi unidad" (`frontend/src/app/views/mi-unidad/mi-unidad.component.ts`) restringida por guard de rol `UnidadDeRespuesta`, que solo permite ver/actualizar el estado operativo y la posición de la propia unidad — **agregado tras Analyze (hallazgo C1)** — FR-120
 
 **Checkpoint**: US1 completamente funcional y probada de forma independiente,
 incluida la restricción de acceso propio del rol `UnidadDeRespuesta` (FR-120).
