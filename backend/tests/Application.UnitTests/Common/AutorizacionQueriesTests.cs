@@ -60,7 +60,8 @@ public class AutorizacionQueriesTests
         var dto = new DashboardIndicadoresDto
         {
             EmergenciasPorEstado = [],
-            EmergenciasPorPrioridad = []
+            EmergenciasPorPrioridad = [],
+            EmergenciasPorAmbito = []
         };
 
         Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>

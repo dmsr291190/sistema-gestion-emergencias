@@ -24,6 +24,37 @@ import { ESTADO_EMERGENCIA_COLOR_POR_NOMBRE, PRIORIDAD_COLOR_POR_NOMBRE } from '
         <c-widget-stat-a [value]="(indicadores()?.unidadesFueraDeServicio ?? 0).toString()" title="Fuera de servicio" [color]="'danger'" />
       </div>
     </div>
+    <div class="row g-4 mb-4">
+      <div class="col-sm-4">
+        <c-widget-stat-a [value]="(indicadores()?.personalDesplegado ?? 0).toString()" title="Personal desplegado" [color]="'info'" />
+      </div>
+      <div class="col-sm-4">
+        <c-widget-stat-a [value]="(indicadores()?.recursosMovilizados ?? 0).toString()" title="Recursos movilizados" [color]="'info'" />
+      </div>
+      <div class="col-sm-4">
+        <c-widget-stat-a [value]="tiempoPromedioLabel()" title="Tiempo promedio de atención" [color]="'primary'" />
+      </div>
+    </div>
+    <div class="row g-4 mb-4">
+      <div class="col-md-12">
+        <c-card>
+          <c-card-header>Emergencias activas por ámbito</c-card-header>
+          <c-card-body>
+            @if (ambitosOrdenados().length === 0) {
+              <p class="text-body-secondary">Sin emergencias activas.</p>
+            }
+            <div class="d-flex gap-4 flex-wrap">
+              @for (item of ambitosOrdenados(); track item.clave) {
+                <div class="text-center">
+                  <div class="fs-4 fw-bold">{{ item.valor }}</div>
+                  <div class="text-body-secondary small">{{ item.clave }}</div>
+                </div>
+              }
+            </div>
+          </c-card-body>
+        </c-card>
+      </div>
+    </div>
     <div class="row g-4">
       <div class="col-md-6">
         <c-card>
@@ -83,5 +114,15 @@ export class DashboardComponent implements OnInit {
 
   prioridadesOrdenadas(): { clave: string; valor: number }[] {
     return this.aLista(this.indicadores()?.emergenciasPorPrioridad);
+  }
+
+  ambitosOrdenados(): { clave: string; valor: number }[] {
+    return this.aLista(this.indicadores()?.emergenciasPorAmbito);
+  }
+
+  tiempoPromedioLabel(): string {
+    const minutos = this.indicadores()?.tiempoPromedioAtencionMinutos;
+    if (minutos == null) return 'Sin datos';
+    return minutos < 60 ? `${minutos.toFixed(0)} min` : `${(minutos / 60).toFixed(1)} h`;
   }
 }

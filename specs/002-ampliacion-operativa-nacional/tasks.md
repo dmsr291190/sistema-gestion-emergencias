@@ -235,8 +235,8 @@ solo con la pantalla.
 **Independent Test**: con datos demo cargados, verificar que los nuevos indicadores
 coinciden con los datos reales.
 
-- [ ] T058 [US8] Extender `ObtenerIndicadoresDashboardQuery` con `emergenciasPorAmbito`, `tiempoPromedioAtencionMinutos`, `personalDesplegado`, `recursosMovilizados` — FR-127
-- [ ] T059 [P] [US8] Frontend: nuevos widgets del dashboard (desglose por ámbito, tiempo promedio) en `frontend/src/app/views/dashboard/dashboard.component.ts`
+- [x] T058 [US8] Extender `ObtenerIndicadoresDashboardQuery` con `emergenciasPorAmbito`, `tiempoPromedioAtencionMinutos`, `personalDesplegado`, `recursosMovilizados` — FR-127
+- [x] T059 [P] [US8] Frontend: nuevos widgets del dashboard (desglose por ámbito, tiempo promedio) en `frontend/src/app/views/dashboard/dashboard.component.ts`
 
 **Checkpoint**: US8 completamente funcional y probada de forma independiente.
 
