@@ -42,7 +42,23 @@ funcionando.
   para referenciar el catálogo, o el catálogo aplica solo hacia adelante? → A: Se
   migran: al activar la ampliación, cada emergencia existente se vincula al tipo del
   catálogo que coincida por nombre (creando ese tipo en el catálogo si no existe
-  todavía), para que no queden emergencias del MVP sin tipo de catálogo.
+  todavía), para que no queden emergencias del MVP sin tipo de catálogo. El tipo
+  creado por esta migración queda **activo** por defecto, para no bloquear el
+  registro de nuevas emergencias de ese tipo.
+
+### Session 2026-09-26 (continuación — hallazgos de Checklist)
+
+- Q: "Institución" aparece en Personal, Recurso y Usuario ampliado — ¿es un único
+  catálogo compartido de organismos (bomberos, policía, salud, marina, etc.), o
+  un catálogo independiente por cada entidad? → A: Es un único catálogo
+  compartido: la misma lista de instituciones se reutiliza en Personal, Recurso
+  y Usuario.
+- Q: ¿El rol "Visualizador" tiene acceso de solo lectura a todo el sistema
+  autenticado, o solo a un subconjunto de pantallas? → A: Solo a un subconjunto:
+  dado que ya existe una vista pública de solo lectura (US7) para el ciudadano
+  general (incendios, desastres naturales, etc.), el rol "Visualizador"
+  autenticado se limita a mapa y dashboard; no tiene acceso a administración de
+  usuarios, personal ni recursos.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -355,7 +371,9 @@ colores de prioridad/estado ya definidos en el MVP (Historia de Usuario 6).
   una emergencia nueva, sin afectar las emergencias existentes que ya lo usan.
 - **FR-103**: El sistema MUST migrar, al activar esta ampliación, cada valor de
   `Tipo` existente del MVP a un tipo del catálogo con el mismo nombre, creando ese
-  tipo en el catálogo si todavía no existe.
+  tipo en el catálogo si todavía no existe. Todo tipo creado por esta migración
+  MUST quedar activo por defecto, para no bloquear el registro de emergencias
+  nuevas de ese tipo.
 
 **Cobertura geográfica nacional**
 
@@ -423,6 +441,10 @@ colores de prioridad/estado ya definidos en el MVP (Historia de Usuario 6).
 - **FR-120**: El sistema MUST permitir que un usuario con rol "Unidad de respuesta"
   inicie sesión con credenciales propias y actualice el estado operativo y la
   posición de su propia unidad; el acceso de ese rol MUST limitarse a esa función.
+- **FR-120a**: El sistema MUST limitar el acceso de un usuario con rol
+  "Visualizador" a las pantallas de mapa y dashboard en modo solo lectura; ese rol
+  no MUST tener acceso a la administración de usuarios, personal ni recursos
+  (la vista pública sin login, US7, ya cubre la consulta general del ciudadano).
 - **FR-121**: El sistema MUST almacenar las contraseñas mediante un mecanismo de
   hashing seguro; nunca en texto plano.
 
@@ -482,6 +504,10 @@ colores de prioridad/estado ya definidos en el MVP (Historia de Usuario 6).
   fallidos, y trazabilidad de quién lo creó/modificó.
 - **CapaDelMapa**: agrupación visual activable/desactivable en el mapa (emergencias,
   unidades, bases, hospitales, puertos, rutas, histórico).
+- **Institución**: catálogo simple compartido de organismos participantes
+  (bomberos, policía, salud, marina, etc.); una única lista reutilizada como
+  referencia desde Personal, Unidad de respuesta (dueña de sus recursos) y
+  Usuario ampliado, no un catálogo independiente por entidad.
 
 ## Success Criteria *(mandatory)*
 
@@ -520,6 +546,7 @@ colores de prioridad/estado ya definidos en el MVP (Historia de Usuario 6).
   objetivo orientativo para el seed, no como un requisito exacto verificado al
   dato.
 - Los organismos/instituciones (bomberos, policía, salud, marina, etc.) se modelan
-  como un catálogo simple de texto/etiqueta en esta ampliación, sin un módulo
-  completo de gestión institucional — se puede profundizar en una ampliación
-  posterior si se requiere.
+  como un único catálogo simple de texto/etiqueta, compartido por Personal, Unidad
+  de respuesta y Usuario ampliado (no un catálogo independiente por entidad), sin
+  un módulo completo de gestión institucional — se puede profundizar en una
+  ampliación posterior si se requiere.

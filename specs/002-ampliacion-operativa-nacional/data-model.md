@@ -42,6 +42,19 @@ Regla (FR-104): si `Ambito` no tiene dirección formal (marítimo/remoto),
 Departamento/Provincia/Distrito pueden quedar `null`; Latitud/Longitud siempre
 son requeridas.
 
+### Institución
+
+Catálogo único y compartido de organismos participantes (bomberos, policía,
+salud, marina, etc.) — decisión de Diego tras el Checklist (CHK038): una sola
+tabla referenciada por `Personal`, `UnidadRespuesta` (dueña de sus recursos) y
+`Usuario`, no un catálogo por entidad.
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| Id | int (PK) | |
+| Nombre | string, requerido, único | |
+| Activo | bool, default true | |
+
 ### Personal
 
 | Campo | Tipo | Notas |
@@ -49,7 +62,7 @@ son requeridas.
 | Id | int (PK) | |
 | Nombres, Apellidos | string, requerido | |
 | Documento | string, requerido | |
-| Institucion | string | catálogo simple de texto (Assumptions) |
+| InstitucionId | int (FK a Institución) | |
 | Especialidad | string | |
 | Funcion | string | |
 | Certificaciones | string, nullable | texto libre o lista separada por comas |
@@ -86,6 +99,9 @@ son requeridas.
 ### UnidadRespuesta
 
 - **+ `Ubicacion`** (owned type, mismo shape que Emergencia).
+- **+ `InstitucionId`** (FK a Institución) — organismo dueño de la unidad
+  (bomberos, policía, salud, marina, etc.); se muestra en tooltip/popup del mapa
+  (sección 7.2 del documento de origen) y en el detalle de la unidad.
 - **+ `UsuarioId`** (FK nullable a `AspNetUsers`) — vínculo 1-a-1 con la cuenta
   de login propia cuando el rol es "Unidad de respuesta" (Research §2).
 - **+ colección `Personal`** (1-a-muchos).
@@ -93,6 +109,8 @@ son requeridas.
 
 ### Usuario (AspNetUsers, vía Identity — no es una tabla nueva)
 
+- **+ `InstitucionId`** (FK nullable a Institución) — organismo al que pertenece
+  el usuario (mismo catálogo compartido, CHK038).
 - **+ `UltimoAcceso`** (DateTime, nullable).
 - **+ `IntentosFallidos`** (int) — ya soportado nativamente por
   `AccessFailedCount` de Identity; se expone en el DTO de administración.

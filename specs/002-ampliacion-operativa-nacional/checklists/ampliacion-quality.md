@@ -79,9 +79,9 @@ for requirements quality. It does not mean implementation work is complete.
 
 ## Ambiguities & Conflicts
 
-- [ ] CHK037 - ¿Existe conflicto potencial entre FR-102 ("impedir seleccionar un tipo desactivado") y la migración automática FR-103 (que podría crear un tipo nuevo ya desactivado por error de nombre)? [Conflict, Spec §FR-102, FR-103]
-- [ ] CHK038 - ¿Es ambiguo si "Institución" (Personal, Recurso, Usuario) es el mismo catálogo de texto en las tres entidades o tres catálogos independientes? [Ambiguity, Spec §Key Entities]
-- [ ] CHK039 - ¿Es ambiguo si el "Visualizador" (rol nuevo) tiene acceso de solo lectura a todo el sistema autenticado o solo a un subconjunto de pantallas? [Ambiguity, Gap]
+- [x] CHK037 - ¿Existe conflicto potencial entre FR-102 ("impedir seleccionar un tipo desactivado") y la migración automática FR-103 (que podría crear un tipo nuevo ya desactivado por error de nombre)? [Conflict, Spec §FR-102, FR-103] — Resuelto: Diego confirmó que el tipo migrado queda **activo** por defecto; FR-103 actualizado en el spec.
+- [x] CHK038 - ¿Es ambiguo si "Institución" (Personal, Recurso, Usuario) es el mismo catálogo de texto en las tres entidades o tres catálogos independientes? [Ambiguity, Spec §Key Entities] — Resuelto: Diego confirmó un único catálogo compartido; agregado como entidad `Institución` en data-model.md y como Key Entity en spec.md.
+- [x] CHK039 - ¿Es ambiguo si el "Visualizador" (rol nuevo) tiene acceso de solo lectura a todo el sistema autenticado o solo a un subconjunto de pantallas? [Ambiguity, Gap] — Resuelto: Diego confirmó que se limita a mapa + dashboard (la vista pública, US7, ya cubre la consulta general del ciudadano); agregado FR-120a al spec.
 
 ## Notes
 
