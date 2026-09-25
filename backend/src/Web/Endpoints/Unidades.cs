@@ -16,7 +16,15 @@ public class Unidades : IEndpointGroup
         groupBuilder.MapPost(CrearUnidad);
         groupBuilder.MapGet(ListarUnidades);
         groupBuilder.MapGet(ObtenerMiUnidad, "mia");
+        groupBuilder.MapGet(ObtenerUnidad, "{id}");
         groupBuilder.MapPatch(CambiarEstado, "{id}/estado");
+    }
+
+    // US5: detalle de una unidad (para la vista con personal y recursos).
+    public static async Task<Results<Ok<UnidadDto>, NotFound>> ObtenerUnidad(ISender sender, int id)
+    {
+        var unidad = await sender.Send(new ObtenerUnidadPorIdQuery { UnidadId = id });
+        return unidad != null ? TypedResults.Ok(unidad) : TypedResults.NotFound();
     }
 
     // FR-120: endpoint dedicado para el rol UnidadDeRespuesta -- ver

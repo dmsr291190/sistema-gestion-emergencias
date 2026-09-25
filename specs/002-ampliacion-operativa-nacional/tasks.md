@@ -174,15 +174,15 @@ cantidad/mínimo, y verificar que se puede consultar al seleccionar la unidad.
 
 ### Tests para User Story 5
 
-- [ ] T043 [P] [US5] Prueba unitaria: un recurso con `CantidadDisponible < CantidadMinima` se marca `bajoStock = true` en `backend/tests/Application.UnitTests/Recursos/AlertaBajoStockTests.cs` — FR-112
+- [x] T043 [P] [US5] Prueba unitaria: un recurso con `CantidadDisponible < CantidadMinima` se marca `bajoStock = true` en `backend/tests/Application.UnitTests/Recursos/AlertaBajoStockTests.cs` — FR-112
 
 ### Implementación de User Story 5
 
-- [ ] T044 [US5] Commands `CrearPersonal`, `EditarPersonal` (`[Authorize(Roles = "CoordinadorLogistico,JefeDeUnidad")]`) en `backend/src/Application/Personal/Commands/` — FR-110
-- [ ] T045 [US5] Commands `CrearRecurso`, `ActualizarCantidadRecurso` en `backend/src/Application/Recursos/Commands/` — FR-111, FR-112
-- [ ] T046 [US5] Queries `ListarPersonalPorUnidadQuery`, `ListarRecursosPorUnidadQuery` (con `bajoStock` calculado) en `backend/src/Application/{Personal,Recursos}/Queries/`
-- [ ] T047 [US5] Endpoints `backend/src/Web/Endpoints/{Personal,Recursos}.cs` bajo `/api/Unidades/{unidadId}/personal` y `/api/Unidades/{unidadId}/recursos`
-- [ ] T048 [P] [US5] Frontend: sección de personal y recursos en el detalle de unidad, con indicador visual de bajo stock, en `frontend/src/app/views/unidades/detalle/unidad-detalle.component.ts`
+- [x] T044 [US5] Commands `CrearPersonal`, `EditarPersonal` (`[Authorize(Roles = "CoordinadorLogistico,JefeDeUnidad")]`) en `backend/src/Application/PersonalUnidades/Commands/` — FR-110 — **carpeta/namespace renombrado a `PersonalUnidades`** (no `Personal`): la entidad `Sige.Domain.Entities.Personal` colisionaba en tiempo de compilación con un namespace `Sige.Application.Personal` (CS0118, "'Personal' es espacio de nombres pero se usa como tipo" en `IApplicationDbContext.cs`)
+- [x] T045 [US5] Commands `CrearRecurso`, `ActualizarCantidadRecurso` en `backend/src/Application/Recursos/Commands/` — FR-111, FR-112
+- [x] T046 [US5] Queries `ListarPersonalPorUnidadQuery`, `ListarRecursosPorUnidadQuery` (con `bajoStock` calculado) en `backend/src/Application/{Personal,Recursos}/Queries/`
+- [x] T047 [US5] Endpoints `backend/src/Web/Endpoints/{Personal,Recursos}.cs` bajo `/api/Unidades/{unidadId}/personal` y `/api/Unidades/{unidadId}/recursos`
+- [x] T048 [P] [US5] Frontend: sección de personal y recursos en el detalle de unidad, con indicador visual de bajo stock, en `frontend/src/app/views/unidades/detalle/unidad-detalle.component.ts`
 
 **Checkpoint**: US5 completamente funcional y probada de forma independiente.
 

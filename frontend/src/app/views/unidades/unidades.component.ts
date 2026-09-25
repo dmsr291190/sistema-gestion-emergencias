@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CardBodyComponent, CardComponent, CardHeaderComponent } from '@coreui/angular';
 import { AuthService } from '../../core/services/auth.service';
 import { UnidadesService } from '../../core/services/unidades.service';
@@ -15,7 +16,7 @@ import { ESTADO_OPERATIVO_UNIDAD_LABEL, TIPO_UNIDAD_LABEL } from '../../core/mod
 @Component({
   selector: 'app-unidades',
   standalone: true,
-  imports: [FormsModule, CardComponent, CardHeaderComponent, CardBodyComponent, FormFieldComponent],
+  imports: [FormsModule, RouterLink, CardComponent, CardHeaderComponent, CardBodyComponent, FormFieldComponent],
   template: `
     <div class="row g-4">
       @if (auth.isSupervisor()) {
@@ -63,7 +64,7 @@ import { ESTADO_OPERATIVO_UNIDAD_LABEL, TIPO_UNIDAD_LABEL } from '../../core/mod
           <c-card-body>
             <table class="table table-sm">
               <thead>
-                <tr><th>Identificador</th><th>Tipo</th><th>Estado</th>@if (auth.isSupervisor()) {<th></th>}</tr>
+                <tr><th>Identificador</th><th>Tipo</th><th>Estado</th><th></th>@if (auth.isSupervisor()) {<th></th>}</tr>
               </thead>
               <tbody>
                 @for (u of unidades(); track u.id) {
@@ -71,6 +72,7 @@ import { ESTADO_OPERATIVO_UNIDAD_LABEL, TIPO_UNIDAD_LABEL } from '../../core/mod
                     <td>{{ u.identificador }}</td>
                     <td>{{ tipoLabel[u.tipo] }}</td>
                     <td>{{ estadoLabel[u.estadoOperativo] }}</td>
+                    <td><a [routerLink]="['/unidades', u.id]">Ver detalle</a></td>
                     @if (auth.isSupervisor()) {
                       <td>
                         <select class="form-select form-select-sm" [ngModel]="u.estadoOperativo"
@@ -83,7 +85,7 @@ import { ESTADO_OPERATIVO_UNIDAD_LABEL, TIPO_UNIDAD_LABEL } from '../../core/mod
                     }
                   </tr>
                 } @empty {
-                  <tr><td colspan="4" class="text-body-secondary">Sin unidades registradas.</td></tr>
+                  <tr><td colspan="5" class="text-body-secondary">Sin unidades registradas.</td></tr>
                 }
               </tbody>
             </table>

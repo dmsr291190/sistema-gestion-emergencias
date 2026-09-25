@@ -17,6 +17,10 @@ export class UnidadesService {
 
   constructor(private readonly http: HttpClient) {}
 
+  obtener(id: number): Observable<Unidad> {
+    return this.http.get<Unidad>(`${this.baseUrl}/${id}`);
+  }
+
   listar(filtros?: FiltrosUnidades): Observable<Unidad[]> {
     const params: Record<string, string> = {};
     if (filtros?.tipo != null) params['tipo'] = String(filtros.tipo);

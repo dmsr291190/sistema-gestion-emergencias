@@ -282,7 +282,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     boton.textContent = 'Ver detalle completo';
     boton.addEventListener('click', () => {
       this.map?.closePopup();
-      this.router.navigate(['/unidades']);
+      this.router.navigate(['/unidades', u.id]);
     });
     div.appendChild(boton);
     return div;

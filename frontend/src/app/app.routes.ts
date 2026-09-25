@@ -10,6 +10,7 @@ import { MapaComponent } from './views/mapa/mapa.component';
 import { EmergenciasComponent } from './views/emergencias/emergencias.component';
 import { EmergenciaDetalleComponent } from './views/emergencias/detalle/emergencia-detalle.component';
 import { UnidadesComponent } from './views/unidades/unidades.component';
+import { UnidadDetalleComponent } from './views/unidades/detalle/unidad-detalle.component';
 import { DespachoComponent } from './views/despacho/despacho.component';
 import { UsuariosComponent } from './views/usuarios/usuarios.component';
 import { MiUnidadComponent } from './views/mi-unidad/mi-unidad.component';
@@ -28,6 +29,7 @@ export const routes: Routes = [
       { path: 'emergencias', component: EmergenciasComponent, canActivate: [noVisualizadorGuard] },
       { path: 'emergencias/:id', component: EmergenciaDetalleComponent, canActivate: [noVisualizadorGuard] },
       { path: 'unidades', component: UnidadesComponent, canActivate: [noVisualizadorGuard] },
+      { path: 'unidades/:id', component: UnidadDetalleComponent, canActivate: [noVisualizadorGuard] },
       { path: 'despacho', component: DespachoComponent, canActivate: [noVisualizadorGuard] },
       // US1, FR-116: administración de usuarios y roles ampliados (solo Administrador).
       { path: 'usuarios', component: UsuariosComponent, canActivate: [administradorGuard] },
