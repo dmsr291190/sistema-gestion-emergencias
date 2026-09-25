@@ -33,9 +33,16 @@ public class Unidades : IEndpointGroup
         return TypedResults.Created($"/api/Unidades/{id}", id);
     }
 
-    public static async Task<Ok<List<UnidadDto>>> ListarUnidades(ISender sender)
+    // FR-108: filtros opcionales del mapa avanzado (US4).
+    public static async Task<Ok<List<UnidadDto>>> ListarUnidades(
+        ISender sender, TipoUnidad? tipo, EstadoOperativoUnidad? estadoOperativo, int? institucionId)
     {
-        var unidades = await sender.Send(new ListarUnidadesQuery());
+        var unidades = await sender.Send(new ListarUnidadesQuery
+        {
+            Tipo = tipo,
+            EstadoOperativo = estadoOperativo,
+            InstitucionId = institucionId
+        });
         return TypedResults.Ok(unidades);
     }
 

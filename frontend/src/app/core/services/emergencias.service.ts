@@ -2,7 +2,17 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../api-config';
-import { CrearEmergenciaRequest, Emergencia, EmergenciaDetalle, EstadoAsignacion } from '../models/emergencia.model';
+import { Ambito, CrearEmergenciaRequest, Emergencia, EmergenciaDetalle, EstadoAsignacion, EstadoEmergencia, Prioridad } from '../models/emergencia.model';
+
+// FR-108: filtros opcionales del mapa avanzado (US4).
+export interface FiltrosEmergencias {
+  tipoEmergenciaId?: number | null;
+  prioridad?: Prioridad | null;
+  estado?: EstadoEmergencia | null;
+  ambito?: Ambito | null;
+  departamento?: string | null;
+  provincia?: string | null;
+}
 
 @Injectable({ providedIn: 'root' })
 export class EmergenciasService {
@@ -10,8 +20,16 @@ export class EmergenciasService {
 
   constructor(private readonly http: HttpClient) {}
 
-  listar(): Observable<Emergencia[]> {
-    return this.http.get<Emergencia[]>(this.baseUrl);
+  listar(filtros?: FiltrosEmergencias): Observable<Emergencia[]> {
+    const params: Record<string, string> = {};
+    if (filtros?.tipoEmergenciaId != null) params['tipoEmergenciaId'] = String(filtros.tipoEmergenciaId);
+    if (filtros?.prioridad != null) params['prioridad'] = String(filtros.prioridad);
+    if (filtros?.estado != null) params['estado'] = String(filtros.estado);
+    if (filtros?.ambito != null) params['ambito'] = String(filtros.ambito);
+    if (filtros?.departamento) params['departamento'] = filtros.departamento;
+    if (filtros?.provincia) params['provincia'] = filtros.provincia;
+
+    return this.http.get<Emergencia[]>(this.baseUrl, { params });
   }
 
   obtener(id: number): Observable<EmergenciaDetalle> {

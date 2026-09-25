@@ -155,11 +155,11 @@ por marcador.
 **Independent Test**: con datos demo cargados, activar/desactivar capas, aplicar un
 filtro por tipo y abrir el resumen de un marcador.
 
-- [ ] T038 [US4] Extender `ListarEmergenciasQuery`/`ListarUnidadesQuery` con filtros por tipo, subtipo, prioridad, estado, ubicación, ámbito, tipo de unidad, institución y disponibilidad — FR-108
-- [ ] T039 [P] [US4] Frontend: leyenda plegable con capas activables/desactivables (emergencias, unidades, bases, hospitales, puertos, rutas, histórico) en `frontend/src/app/views/mapa/leyenda/leyenda.component.ts` — FR-107
-- [ ] T040 [P] [US4] Frontend: iconografía distinta por tipo de emergencia/unidad (usando `@coreui/icons` de T001) en los marcadores Leaflet de `frontend/src/app/views/mapa/mapa.component.ts` — FR-106
-- [ ] T041 [P] [US4] Frontend: filtros del mapa conectados a los parámetros de T038 — FR-108
-- [ ] T042 [US4] Frontend: popup/modal de resumen al hacer clic en un marcador (emergencia o unidad), con botón "Ver detalle completo", sin cerrar el mapa — FR-109
+- [x] T038 [US4] Extender `ListarEmergenciasQuery`/`ListarUnidadesQuery` con filtros por tipo, subtipo, prioridad, estado, ubicación, ámbito, tipo de unidad, institución y disponibilidad — FR-108
+- [x] T039 [P] [US4] Frontend: leyenda plegable con capas activables/desactivables (emergencias, unidades, bases, hospitales, puertos, rutas, histórico) en `frontend/src/app/views/mapa/leyenda/leyenda.component.ts` — FR-107
+- [x] T040 [P] [US4] Frontend: iconografía distinta por tipo de emergencia/unidad (usando `@coreui/icons` de T001) en los marcadores Leaflet de `frontend/src/app/views/mapa/mapa.component.ts` — FR-106
+- [x] T041 [P] [US4] Frontend: filtros del mapa conectados a los parámetros de T038 — FR-108
+- [x] T042 [US4] Frontend: popup/modal de resumen al hacer clic en un marcador (emergencia o unidad), con botón "Ver detalle completo", sin cerrar el mapa — FR-109
 
 **Checkpoint**: US4 completamente funcional y probada de forma independiente.
 

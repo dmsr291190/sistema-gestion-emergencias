@@ -1,14 +1,24 @@
 using Sige.Application.Common.Interfaces;
 using Sige.Application.Common.Security;
+using Sige.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Sige.Application.Emergencias.Queries;
 
-// FR-003, FR-011: emergencias para el mapa operativo y el dashboard.
+// FR-003, FR-011, FR-108: emergencias para el mapa operativo y el dashboard, con
+// filtros opcionales para el mapa avanzado (US4).
 // Constitution Principio V: todo acceso MUST requerir autenticacion. Hallazgo de
 // Converge: esta query no tenia [Authorize] y respondia sin token.
 [Authorize]
-public record ListarEmergenciasQuery : IRequest<List<EmergenciaDto>>;
+public record ListarEmergenciasQuery : IRequest<List<EmergenciaDto>>
+{
+    public int? TipoEmergenciaId { get; init; }
+    public Prioridad? Prioridad { get; init; }
+    public EstadoEmergencia? Estado { get; init; }
+    public Ambito? Ambito { get; init; }
+    public string? Departamento { get; init; }
+    public string? Provincia { get; init; }
+}
 
 public class ListarEmergenciasQueryHandler : IRequestHandler<ListarEmergenciasQuery, List<EmergenciaDto>>
 {
@@ -21,7 +31,16 @@ public class ListarEmergenciasQueryHandler : IRequestHandler<ListarEmergenciasQu
 
     public async Task<List<EmergenciaDto>> Handle(ListarEmergenciasQuery request, CancellationToken cancellationToken)
     {
-        return await _context.Emergencias
+        var query = _context.Emergencias.AsQueryable();
+
+        if (request.TipoEmergenciaId.HasValue) query = query.Where(e => e.TipoEmergenciaId == request.TipoEmergenciaId);
+        if (request.Prioridad.HasValue) query = query.Where(e => e.Prioridad == request.Prioridad);
+        if (request.Estado.HasValue) query = query.Where(e => e.Estado == request.Estado);
+        if (request.Ambito.HasValue) query = query.Where(e => e.Ubicacion.Ambito == request.Ambito);
+        if (!string.IsNullOrWhiteSpace(request.Departamento)) query = query.Where(e => e.Ubicacion.Departamento == request.Departamento);
+        if (!string.IsNullOrWhiteSpace(request.Provincia)) query = query.Where(e => e.Ubicacion.Provincia == request.Provincia);
+
+        return await query
             .OrderByDescending(e => e.FechaHoraReporte)
             .Select(e => new EmergenciaDto
             {

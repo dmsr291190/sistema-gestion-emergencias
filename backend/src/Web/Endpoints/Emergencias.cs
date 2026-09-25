@@ -4,6 +4,7 @@ using Sige.Application.Emergencias.Commands.CrearEmergencia;
 using Sige.Application.Emergencias.Commands.ReabrirEmergencia;
 using Sige.Application.Emergencias.Commands.ValidarEmergencia;
 using Sige.Application.Emergencias.Queries;
+using Sige.Domain.Enums;
 using Sige.Web.Hubs;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
@@ -34,9 +35,20 @@ public class Emergencias : IEndpointGroup
         return TypedResults.Created($"/api/Emergencias/{id}", id);
     }
 
-    public static async Task<Ok<List<EmergenciaDto>>> ListarEmergencias(ISender sender)
+    // FR-108: filtros opcionales del mapa avanzado (US4), todos vía query string.
+    public static async Task<Ok<List<EmergenciaDto>>> ListarEmergencias(
+        ISender sender, int? tipoEmergenciaId, Prioridad? prioridad, EstadoEmergencia? estado,
+        Ambito? ambito, string? departamento, string? provincia)
     {
-        var emergencias = await sender.Send(new ListarEmergenciasQuery());
+        var emergencias = await sender.Send(new ListarEmergenciasQuery
+        {
+            TipoEmergenciaId = tipoEmergenciaId,
+            Prioridad = prioridad,
+            Estado = estado,
+            Ambito = ambito,
+            Departamento = departamento,
+            Provincia = provincia
+        });
         return TypedResults.Ok(emergencias);
     }
 
